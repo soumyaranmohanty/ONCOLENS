@@ -1,0 +1,20 @@
+/.claude
+/.agents
+/.DS_Store
+/app
+/claude plans
+
+/Docs
+Data/.DS_Store
+EXP/.DS_Store
+/EXP/miscleneous
+
+/EXP/not_used*.*
+
+/EXP/gene_expression.ipynb
+
+/luad_tcga_pan_can_atlas_2018
+
+/Papers
+/Selected_Papers
+

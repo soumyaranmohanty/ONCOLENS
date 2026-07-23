@@ -1,0 +1,13 @@
+{
+  "target": "PFS_STATUS",
+  "model_type": "Random Forest",
+  "n_genes": 71,
+  "cv_auc_mean": 0.6929,
+  "cv_auc_std": 0.045,
+  "test_auc": 0.5774,
+  "scoring": "roc_auc",
+  "train_patients": 367,
+  "test_patients": 92,
+  "total_patients": 459,
+  "created": "2026-06-17"
+}

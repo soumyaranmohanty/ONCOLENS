@@ -1,0 +1,13 @@
+{
+  "target": "Stage",
+  "model_type": "Random Forest",
+  "n_genes": 43,
+  "cv_auc_mean": 0.6297,
+  "cv_auc_std": 0.0306,
+  "test_auc": 0.4576,
+  "scoring": "roc_auc_ovr_weighted",
+  "train_patients": 363,
+  "test_patients": 91,
+  "total_patients": 454,
+  "created": "2026-07-05"
+}

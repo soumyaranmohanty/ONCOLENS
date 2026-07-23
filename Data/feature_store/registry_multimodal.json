@@ -1,0 +1,35 @@
+{
+  "OS_STATUS": {
+    "target": "OS_STATUS",
+    "artifact_path": "/Users/soumya/Documents/ONCOLENS/Data/feature_store/multimodal_model/OS_STATUS/multimodal_stack.joblib",
+    "metadata_path": "/Users/soumya/Documents/ONCOLENS/Data/feature_store/multimodal_model/OS_STATUS/metadata.json",
+    "features_manifest_path": "/Users/soumya/Documents/ONCOLENS/Data/feature_store/multimodal_model/OS_STATUS/features_manifest.json",
+    "test_predictions_path": "/Users/soumya/Documents/ONCOLENS/Data/feature_store/multimodal_model/OS_STATUS/test_predictions.csv",
+    "stacked_heldout_test_auc": 0.783626,
+    "train_patients": 360,
+    "test_patients": 90,
+    "created_at": "2026-07-10T14:00:49"
+  },
+  "PFS_STATUS": {
+    "target": "PFS_STATUS",
+    "artifact_path": "/Users/soumya/Documents/ONCOLENS/Data/feature_store/multimodal_model/PFS_STATUS/multimodal_stack.joblib",
+    "metadata_path": "/Users/soumya/Documents/ONCOLENS/Data/feature_store/multimodal_model/PFS_STATUS/metadata.json",
+    "features_manifest_path": "/Users/soumya/Documents/ONCOLENS/Data/feature_store/multimodal_model/PFS_STATUS/features_manifest.json",
+    "test_predictions_path": "/Users/soumya/Documents/ONCOLENS/Data/feature_store/multimodal_model/PFS_STATUS/test_predictions.csv",
+    "stacked_heldout_test_auc": 0.727501,
+    "train_patients": 360,
+    "test_patients": 90,
+    "created_at": "2026-07-10T14:00:49"
+  },
+  "Stage": {
+    "target": "Stage",
+    "artifact_path": "/Users/soumya/Documents/ONCOLENS/Data/feature_store/multimodal_model/Stage/multimodal_stack.joblib",
+    "metadata_path": "/Users/soumya/Documents/ONCOLENS/Data/feature_store/multimodal_model/Stage/metadata.json",
+    "features_manifest_path": "/Users/soumya/Documents/ONCOLENS/Data/feature_store/multimodal_model/Stage/features_manifest.json",
+    "test_predictions_path": "/Users/soumya/Documents/ONCOLENS/Data/feature_store/multimodal_model/Stage/test_predictions.csv",
+    "stacked_heldout_test_auc": 0.609033,
+    "train_patients": 360,
+    "test_patients": 90,
+    "created_at": "2026-07-10T14:00:49"
+  }
+}

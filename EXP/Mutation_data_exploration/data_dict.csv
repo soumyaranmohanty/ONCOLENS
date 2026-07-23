@@ -1,0 +1,115 @@
+Column,Meaning,Example,Category
+Hugo_Symbol,HGNC gene symbol,CPN1,Gene ID
+Entrez_Gene_Id,NCBI Entrez gene ID,1369,Gene ID
+Center,Sequencing center that generated the data,.,Sequencing Metadata
+NCBI_Build,Genome assembly version,GRCh37,Genomic Location
+Chromosome,Chromosome number,10,Genomic Location
+Start_Position,1-based start coordinate of the variant,101814119,Genomic Location
+End_Position,1-based end coordinate of the variant,101814119,Genomic Location
+Strand,Genomic strand (always + in MAF),+,Genomic Location
+Consequence,VEP consequence term,missense_variant,Variant Details
+Variant_Classification,MAF variant class (oncotator-style),Missense_Mutation,Variant Details
+Variant_Type,"Mutation type: SNP, DNP, INS, DEL",SNP,Variant Details
+Reference_Allele,Reference base(s) at the locus,G,Allele Info
+Tumor_Seq_Allele1,Tumor allele 1 (usually = reference),G,Allele Info
+Tumor_Seq_Allele2,Tumor allele 2 (the alternate/mutant allele),C,Allele Info
+dbSNP_RS,dbSNP rs ID if the variant is in dbSNP,.,Variant Details
+dbSNP_Val_Status,dbSNP validation status,.,Quality/Validation
+Tumor_Sample_Barcode,TCGA tumor sample barcode (patient ID + sample type),TCGA-05-4244-01,Sample ID
+Matched_Norm_Sample_Barcode,Matched normal tissue sample barcode,TCGA-05-4244-10,Sample ID
+Match_Norm_Seq_Allele1,Normal allele 1 at the variant position,G,Allele Info
+Match_Norm_Seq_Allele2,Normal allele 2 at the variant position,G,Allele Info
+Tumor_Validation_Allele1,Tumor allele 1 from orthogonal validation,.,Quality/Validation
+Tumor_Validation_Allele2,Tumor allele 2 from orthogonal validation,.,Quality/Validation
+Match_Norm_Validation_Allele1,Normal allele 1 from orthogonal validation,.,Quality/Validation
+Match_Norm_Validation_Allele2,Normal allele 2 from orthogonal validation,.,Quality/Validation
+Verification_Status,Whether the variant was verified,.,Quality/Validation
+Validation_Status,"Validation result (Valid/Invalid/Unknown)",.,Quality/Validation
+Mutation_Status,Somatic vs germline call,.,Variant Details
+Sequencing_Phase,Phase of sequencing (exome capture batch),.,Sequencing Metadata
+Sequence_Source,"Source of sequencing (WXS, WGS, etc.)",.,Sequencing Metadata
+Validation_Method,Method used for validation,.,Quality/Validation
+Score,Variant caller confidence score,.,Quality/Validation
+BAM_File,Path to BAM file (usually redacted in public data),.,Sequencing Metadata
+Sequencer,Sequencing platform (e.g. Illumina HiSeq),.,Sequencing Metadata
+t_ref_count,Read count supporting reference allele in tumor,98,Read Counts
+t_alt_count,Read count supporting alternate allele in tumor,26,Read Counts
+n_ref_count,Read count supporting reference allele in normal,140,Read Counts
+n_alt_count,Read count supporting alternate allele in normal,0,Read Counts
+HGVSc,HGVS coding DNA sequence change notation,ENST00000370418.3:c.1096C>G,Protein Impact
+HGVSp,HGVS protein change notation (full),p.His366Asp,Protein Impact
+HGVSp_Short,HGVS protein change in abbreviated form,p.H366D,Protein Impact
+Transcript_ID,Ensembl transcript identifier,ENST00000370418,Transcript
+RefSeq,NCBI RefSeq transcript identifier,NM_001308.2,Transcript
+Protein_position,Amino acid position of the change,366,Protein Impact
+Codons,Reference and alternate codon pair,Cat/Gat,Protein Impact
+Hotspot,Whether the mutation falls in a known cancer hotspot (0/1),0,Hotspot
+AA_MAF,Minor allele frequency in African American (1000G),.,Population Freq (1000G)
+AFR_MAF,Minor allele frequency in African (1000G),.,Population Freq (1000G)
+ALLELE_NUM,Allele number index from VEP (used for multi-allelic sites),.,VEP Annotation
+AMR_MAF,Minor allele frequency in Admixed American (1000G),.,Population Freq (1000G)
+ASN_MAF,Minor allele frequency in Asian — legacy 1000G label,.,Population Freq (1000G)
+Allele,Alternate allele as seen by VEP,C,VEP Annotation
+Amino_acids,Reference/alternate amino acids in single-letter code,H/D,Protein Impact
+BIOTYPE,Ensembl transcript biotype,protein_coding,VEP Annotation
+CANONICAL,Whether the transcript is the canonical transcript (YES/.),YES,VEP Annotation
+CCDS,CCDS transcript ID,CCDS7486.1,Transcript
+CDS_position,Position within the coding sequence,1096,Transcript
+CENTERS,Pipe-delimited list of variant calling centers that called this mutation,SOMATICSNIPER|RADIA|MUTECT|MUSE|VARSCANS,Sequencing Metadata
+CLIN_SIG,"ClinVar clinical significance (pathogenic, benign, etc.)",.,Clinical Significance
+CONTEXT,Trinucleotide sequence context around the variant,ATCATGGTTAA,Variant Details
+COSMIC,COSMIC mutation ID(s),COSM536850,Clinical Significance
+DBVS,dbSNP validation status from VEP,.,Quality/Validation
+DISTANCE,Distance to nearest splice site (for intronic variants),.,VEP Annotation
+DOMAINS,"Protein domains affected (Pfam, SMART, Gene3D, etc.)","hmmpanther:PTHR11532,Pfam_domain:PF13620",Functional Prediction
+EAS_MAF,Minor allele frequency in East Asian (1000G),.,Population Freq (1000G)
+EA_MAF,Minor allele frequency in East Asian — alternate 1000G label,.,Population Freq (1000G)
+ENSP,Ensembl protein identifier,ENSP00000359446,Gene ID
+EUR_MAF,Minor allele frequency in European (1000G),.,Population Freq (1000G)
+EXON,Exon number / total exons for the variant transcript,7/9,Transcript
+ExAC_AF,Overall allele frequency in ExAC across all populations,.,Population Freq (ExAC)
+ExAC_AF_AFR,ExAC allele frequency in African population,.,Population Freq (ExAC)
+ExAC_AF_AMR,ExAC allele frequency in Admixed American,.,Population Freq (ExAC)
+ExAC_AF_EAS,ExAC allele frequency in East Asian,.,Population Freq (ExAC)
+ExAC_AF_FIN,ExAC allele frequency in Finnish European,.,Population Freq (ExAC)
+ExAC_AF_NFE,ExAC allele frequency in Non-Finnish European,.,Population Freq (ExAC)
+ExAC_AF_OTH,ExAC allele frequency in other/unclassified populations,.,Population Freq (ExAC)
+ExAC_AF_SAS,ExAC allele frequency in South Asian,.,Population Freq (ExAC)
+Existing_variation,"Known variant IDs co-located with this site (dbSNP, COSMIC)",.,Variant Details
+Exon_Number,Exon number from oncotator annotation,7/9,Transcript
+FILTER,Variant call filter status (PASS or reason for failure),PASS,Quality/Validation
+Feature,Ensembl feature ID (transcript or regulatory element),ENST00000370418,VEP Annotation
+Feature_type,"Type of Ensembl feature (Transcript, RegulatoryFeature, etc.)",Transcript,VEP Annotation
+GENE_PHENO,Whether the gene is associated with a phenotype in Ensembl (1=yes),1,Clinical Significance
+GMAF,Global minor allele frequency across all 1000G populations,.,Population Freq (1000G)
+Gene,Ensembl gene identifier,ENSG00000120054,Gene ID
+HGNC_ID,HGNC numeric gene identifier,2312,Gene ID
+HGVS_OFFSET,Offset used to normalise HGVS notation for indels,.,VEP Annotation
+HIGH_INF_POS,Whether the variant is in a highly informative position within a motif,.,VEP Annotation
+IMPACT,"VEP functional impact tier: HIGH / MODERATE / LOW / MODIFIER",MODERATE,Functional Prediction
+INTRON,Intron number / total introns (for intronic variants),.,Transcript
+MERGESOURCE,Source of merge — internal pipeline provenance field,PRIMARY,Sequencing Metadata
+MINIMISED,Whether VEP minimised the allele representation (1=yes),.,VEP Annotation
+MOTIF_NAME,Name of the regulatory transcription factor motif overlapped,.,VEP Annotation
+MOTIF_POS,Position within the regulatory motif,.,VEP Annotation
+MOTIF_SCORE_CHANGE,Change in motif binding score due to the variant,.,VEP Annotation
+NCALLERS,Number of independent variant callers that agreed on this mutation,5,Quality/Validation
+PHENO,Phenotype association flag from Ensembl/ClinVar (1=yes),1,Clinical Significance
+PICK,VEP flag indicating this is the picked representative transcript annotation,.,VEP Annotation
+PUBMED,PubMed IDs of papers citing this variant,.,Clinical Significance
+PolyPhen,PolyPhen-2 pathogenicity prediction and score (benign/possibly_damaging/probably_damaging),probably_damaging(1),Functional Prediction
+SAS_MAF,Minor allele frequency in South Asian (1000G),.,Population Freq (1000G)
+SIFT,SIFT pathogenicity prediction and score (tolerated/deleterious + numeric score),deleterious(0),Functional Prediction
+SOMATIC,Whether the variant is flagged as somatic in dbSNP (1=yes),1,Variant Details
+SWISSPROT,UniProtKB/Swiss-Prot protein accession,CBPN_HUMAN,Gene ID
+SYMBOL,Gene symbol from VEP annotation (should match Hugo_Symbol),CPN1,Gene ID
+SYMBOL_SOURCE,"Source of the gene symbol (HGNC, EntrezGene, etc.)",HGNC,Gene ID
+TREMBL,UniProtKB/TrEMBL accession(s) for unreviewed protein entries,B1AP59_HUMAN,Gene ID
+TSL,Transcript support level (1=fully supported by evidence to 5=no single transcript support),.,VEP Annotation
+UNIPARC,UniParc protein sequence archive identifier,UPI00000012AC,Gene ID
+VARIANT_CLASS,"Sequence Ontology variant class (SNV, insertion, deletion, indel)",SNV,Variant Details
+all_effects,All VEP consequence terms across all transcripts (semicolon-delimited summary),"CPN1,missense_variant,p.His366Asp,ENST00000370418;",VEP Annotation
+cDNA_position,Position of the variant within the full cDNA sequence,1348,Transcript
+n_depth,Total sequencing depth in normal sample (n_ref_count + n_alt_count),140,Read Counts
+t_depth,Total sequencing depth in tumor sample (t_ref_count + t_alt_count),124,Read Counts
+Annotation_Status,Pipeline annotation completion flag (SUCCESS/FAILED),SUCCESS,Sequencing Metadata

@@ -1,0 +1,41 @@
+{
+  "OS_STATUS": {
+    "target": "OS_STATUS",
+    "model_type": "Random Forest",
+    "n_genes": 88,
+    "cv_auc_mean": 0.7221,
+    "cv_auc_std": 0.0363,
+    "test_auc": 0.6296,
+    "scoring": "roc_auc",
+    "train_patients": 367,
+    "test_patients": 92,
+    "total_patients": 459,
+    "created": "2026-06-17"
+  },
+  "PFS_STATUS": {
+    "target": "PFS_STATUS",
+    "model_type": "Random Forest",
+    "n_genes": 71,
+    "cv_auc_mean": 0.6929,
+    "cv_auc_std": 0.045,
+    "test_auc": 0.5774,
+    "scoring": "roc_auc",
+    "train_patients": 367,
+    "test_patients": 92,
+    "total_patients": 459,
+    "created": "2026-06-17"
+  },
+  "Stage": {
+    "target": "Stage",
+    "model_type": "Random Forest",
+    "n_genes": 99,
+    "cv_auc_mean": 0.7163,
+    "cv_auc_std": 0.0349,
+    "test_auc": 0.5569,
+    "scoring": "roc_auc_ovr_weighted",
+    "train_patients": 367,
+    "test_patients": 92,
+    "total_patients": 459,
+    "created": "2026-06-17"
+  }
+}

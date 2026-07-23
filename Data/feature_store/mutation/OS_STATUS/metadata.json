@@ -1,0 +1,13 @@
+{
+  "target": "OS_STATUS",
+  "model_type": "Random Forest",
+  "n_genes": 36,
+  "cv_auc_mean": 0.7293,
+  "cv_auc_std": 0.0382,
+  "test_auc": 0.5583,
+  "scoring": "roc_auc",
+  "train_patients": 363,
+  "test_patients": 91,
+  "total_patients": 454,
+  "created": "2026-07-05"
+}

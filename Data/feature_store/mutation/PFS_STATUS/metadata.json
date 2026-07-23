@@ -1,0 +1,13 @@
+{
+  "target": "PFS_STATUS",
+  "model_type": "Logistic (LASSO)",
+  "n_genes": 30,
+  "cv_auc_mean": 0.6509,
+  "cv_auc_std": 0.0304,
+  "test_auc": 0.6205,
+  "scoring": "roc_auc",
+  "train_patients": 363,
+  "test_patients": 91,
+  "total_patients": 454,
+  "created": "2026-07-05"
+}
