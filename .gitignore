@@ -2,18 +2,23 @@
 /.agents
 /.DS_Store
 /app
-/claude plans
+/claude plans/gene_expression_plans
+/claude plans/mutation_plans
+/claude plans/*.md
+/claude plans/.DS_Store
+
+Data/.DS_Store
+/Data/raw_data/histopathology
 
 /Docs
-Data/.DS_Store
+
 EXP/.DS_Store
 /EXP/miscleneous
-
 /EXP/not_used*.*
-
 /EXP/gene_expression.ipynb
 
 /luad_tcga_pan_can_atlas_2018
+
 
 /Papers
 /Selected_Papers

@@ -1,0 +1,11 @@
+# Dependencies for the Histopathology module (EXP/histopathology_data_acquisition.ipynb,
+# EXP/histopathology_v1.ipynb). Kept separate from app/requirements.txt, which pins
+# scikit-learn==1.8.0 for the Streamlit serving app — only the final tabular feature
+# bundle from this module needs to ship with the app, not the extraction pipeline.
+
+openslide-python
+Pillow
+histolab
+torch
+torchvision
+opencv-python
