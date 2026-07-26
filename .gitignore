@@ -5,11 +5,11 @@ uv.lock
 /.claude
 /.agents
 /.DS_Store
-/app
 /claude plans/gene_expression_plans
 /claude plans/mutation_plans
 /claude plans/*.md
 /claude plans/.DS_Store
+/claude plans/ui_plans/
 
 Data/.DS_Store
 /Data/raw_data/histopathology

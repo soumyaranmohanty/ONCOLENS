@@ -4,8 +4,8 @@ version = "0.1.0"
 description = "ONCOLENS — TCGA LUAD multimodal survival and staging prediction"
 requires-python = ">=3.11,<3.14"
 dependencies = [
-    "pandas",
-    "numpy",
+    "pandas>=2.2",
+    "numpy>=2.0",
     "scikit-learn==1.8.0",
     "joblib",
     "matplotlib",
@@ -24,7 +24,7 @@ histopathology = [
     "histolab",
     "opencv-python",
 ]
-app = ["streamlit"]
+app = ["streamlit>=1.33", "plotly", "reportlab"]
 
 [tool.uv]
 package = false
