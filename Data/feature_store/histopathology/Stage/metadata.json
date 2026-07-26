@@ -1,0 +1,12 @@
+{
+  "target": "Stage",
+  "model_type": "Logistic (LASSO)",
+  "n_features": 2048,
+  "created": "2026-07-26",
+  "cv_auc_mean": NaN,
+  "cv_auc_std": NaN,
+  "test_auc": 0.475,
+  "train_patients": 36,
+  "test_patients": 9,
+  "total_patients": 45
+}

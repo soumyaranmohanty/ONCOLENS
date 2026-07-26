@@ -1,7 +1,7 @@
 .venv/
 .venv-app/
 uv.lock
-
+.cursor/
 /.claude
 /.agents
 /.DS_Store

@@ -1,0 +1,38 @@
+{
+  "OS_STATUS": {
+    "target": "OS_STATUS",
+    "model_type": "Random Forest",
+    "n_features": 2048,
+    "created": "2026-07-26",
+    "cv_auc_mean": 0.575,
+    "cv_auc_std": 0.264,
+    "test_auc": 0.75,
+    "train_patients": 36,
+    "test_patients": 9,
+    "total_patients": 45
+  },
+  "PFS_STATUS": {
+    "target": "PFS_STATUS",
+    "model_type": "Random Forest",
+    "n_features": 2048,
+    "created": "2026-07-26",
+    "cv_auc_mean": 0.6667,
+    "cv_auc_std": 0.1918,
+    "test_auc": 0.5278,
+    "train_patients": 36,
+    "test_patients": 9,
+    "total_patients": 45
+  },
+  "Stage": {
+    "target": "Stage",
+    "model_type": "Logistic (LASSO)",
+    "n_features": 2048,
+    "created": "2026-07-26",
+    "cv_auc_mean": NaN,
+    "cv_auc_std": NaN,
+    "test_auc": 0.475,
+    "train_patients": 36,
+    "test_patients": 9,
+    "total_patients": 45
+  }
+}
