@@ -1,0 +1,30 @@
+[project]
+name = "oncolens"
+version = "0.1.0"
+description = "ONCOLENS — TCGA LUAD multimodal survival and staging prediction"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "pandas",
+    "numpy",
+    "scikit-learn==1.8.0",
+    "joblib",
+    "matplotlib",
+    "jupyter",
+    "ipykernel",
+    "seaborn",
+    "requests",
+]
+
+[project.optional-dependencies]
+histopathology = [
+    "torch",
+    "torchvision",
+    "openslide-python",
+    "Pillow",
+    "histolab",
+    "opencv-python",
+]
+app = ["streamlit"]
+
+[tool.uv]
+package = false
