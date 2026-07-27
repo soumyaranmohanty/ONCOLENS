@@ -10,7 +10,6 @@ import streamlit as st
 from app.components.charts import render_confusion_matrix, render_roc_curve
 from app.components.metrics import render_disclaimer, render_metric_cards
 from app.components.model_help import render_model_caption, render_models_overview
-from app.components.patient_context import render_patient_context_banner
 from app.config import MODELS, TARGETS, human_class_label
 from app.inference.loaders import four_mod_available
 from app.services.analytics import compute_metrics
@@ -22,8 +21,6 @@ def render() -> None:
         "Explore dataset info, test metrics, and evaluation charts for each of the five backends."
     )
     render_models_overview()
-
-    render_patient_context_banner(cohort_level=True)
 
     model = st.selectbox("Model", MODELS, key="analytics_model")
     render_model_caption(model)

@@ -1,12 +1,22 @@
-"""Active patient context banner and sidebar — shown across all pages."""
+"""Active patient context banner and sidebar — shown on patient-centric pages."""
 
 from __future__ import annotations
 
 from typing import Any
+from urllib.parse import urlparse
 
 import streamlit as st
 
 from app.services.history import init_history
+
+# Pages that show model/cohort metrics only — no session patient UI.
+MODEL_ONLY_URL_PATHS = frozenset({"/", "/dashboard", "/model-analytics", "/research"})
+
+
+def is_model_only_view() -> bool:
+    """True on cohort/model pages with no session patient UI."""
+    path = urlparse(st.context.url or "").path.rstrip("/") or "/"
+    return path in MODEL_ONLY_URL_PATHS
 
 
 def _modalities(patient: dict[str, Any]) -> list[str]:
@@ -28,6 +38,9 @@ def get_active_patient_id() -> str | None:
 
 def render_patient_context_sidebar() -> None:
     """Compact patient summary for the sidebar (call from entry script)."""
+    if is_model_only_view():
+        return
+
     init_history()
     patient = get_active_patient()
     pred = st.session_state.get("last_prediction")

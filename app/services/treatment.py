@@ -1,4 +1,10 @@
-"""Rule-based treatment recommendations (educational)."""
+"""Rule-based treatment recommendations (educational).
+
+Deterministic fallback until the LLM treatment agent is wired in
+(see app/pages/4_Treatment_Recommendation.py). The agent should consume the
+same inputs: patient dict, compare_all() predictions, and optionally this
+function's output as structured context for the prompt.
+"""
 
 from __future__ import annotations
 

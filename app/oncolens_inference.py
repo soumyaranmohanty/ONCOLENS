@@ -27,14 +27,12 @@ with st.sidebar:
     render_patient_context_sidebar()
 
 pages = [
-    st.Page("pages/0_Dashboard.py", title="Dashboard", icon="🏠", default=True),
-    st.Page("pages/1_Patient_Prediction.py", title="Patient Prediction", icon="🔬"),
-    st.Page("pages/2_Model_Analytics.py", title="Model Analytics", icon="📊"),
-    st.Page("pages/3_AI_Clinical_Report.py", title="AI Clinical Report", icon="📋"),
-    st.Page("pages/4_Treatment_Recommendation.py", title="Treatment Recommendation", icon="💊"),
-    st.Page("pages/5_Research_Explainability.py", title="Research & Explainability", icon="🔍"),
-    st.Page("pages/6_Virtual_Assistant.py", title="Virtual AI Assistant", icon="💬"),
-    st.Page("pages/7_About.py", title="About", icon="ℹ️"),
+    st.Page("pages/0_Dashboard.py", title="Dashboard", icon="🏠", default=True, url_path="dashboard"),
+    st.Page("pages/1_Patient_Prediction.py", title="Patient Prediction", icon="🔬", url_path="patient-prediction"),
+    st.Page("pages/2_Model_Analytics.py", title="Model Analytics", icon="📊", url_path="model-analytics"),
+    st.Page("pages/5_Research_Explainability.py", title="Research & Explainability", icon="🔍", url_path="research"),
+    st.Page("pages/6_Virtual_Assistant.py", title="Virtual AI Assistant", icon="💬", url_path="assistant"),
+    st.Page("pages/7_About.py", title="About", icon="ℹ️", url_path="about"),
 ]
 
 pg = st.navigation(pages)
