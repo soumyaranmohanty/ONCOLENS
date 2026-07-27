@@ -14,12 +14,17 @@ _spec.loader.exec_module(_path_mod)
 
 import streamlit as st
 
+from app.components.patient_context import render_patient_context_sidebar
+
 st.set_page_config(
     page_title="ONCOLENS",
     page_icon="🧬",
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+with st.sidebar:
+    render_patient_context_sidebar()
 
 pages = [
     st.Page("pages/0_Dashboard.py", title="Dashboard", icon="🏠", default=True),

@@ -7,7 +7,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from app.config import RISK_THRESHOLDS, SINGLE_MOD_STORE, TARGET_LABEL_MAPS
+from app.config import RISK_THRESHOLDS, SINGLE_MOD_STORE, TARGET_LABEL_MAPS, human_class_label
 from app.inference.align import align_modality, align_single_modality
 from app.inference.loaders import (
     detect_modality_count,
@@ -37,6 +37,8 @@ def _format_binary_result(
     label_map = TARGET_LABEL_MAPS[target]
     pos_idx = 1 if len(classes) > 1 else 0
     pos_prob = float(proba[pos_idx]) if len(proba) > 1 else float(proba[0])
+    probs_raw = {str(int(c)): float(p) for c, p in zip(classes, proba)}
+    probs_labeled = {human_class_label(target, c): float(p) for c, p in zip(classes, proba)}
     return {
         "patient_id": patient_id,
         "model": model_name,
@@ -44,7 +46,9 @@ def _format_binary_result(
         "predicted_label": int(pred_label),
         "predicted_label_name": label_map.get(int(pred_label), str(pred_label)),
         "probability": pos_prob,
-        "probabilities": {str(int(c)): float(p) for c, p in zip(classes, proba)},
+        "probability_label": human_class_label(target, 1 if len(classes) > 1 else int(pred_label)),
+        "probabilities": probs_raw,
+        "probabilities_labeled": probs_labeled,
         "confidence": float(max(proba)),
         "risk_band": _risk_band(pos_prob),
         "available": True,
@@ -61,6 +65,8 @@ def _format_multiclass_result(
 ) -> dict[str, Any]:
     label_map = TARGET_LABEL_MAPS[target]
     conf = float(max(proba))
+    probs_raw = {str(int(c)): float(p) for c, p in zip(classes, proba)}
+    probs_labeled = {human_class_label(target, c): float(p) for c, p in zip(classes, proba)}
     return {
         "patient_id": patient_id,
         "model": model_name,
@@ -68,7 +74,9 @@ def _format_multiclass_result(
         "predicted_label": int(pred_label),
         "predicted_label_name": label_map.get(int(pred_label), f"Stage {pred_label}"),
         "probability": conf,
-        "probabilities": {str(int(c)): float(p) for c, p in zip(classes, proba)},
+        "probability_label": label_map.get(int(pred_label), f"Stage {pred_label}"),
+        "probabilities": probs_raw,
+        "probabilities_labeled": probs_labeled,
         "confidence": conf,
         "risk_band": label_map.get(int(pred_label), str(pred_label)),
         "available": True,

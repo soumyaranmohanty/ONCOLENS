@@ -33,7 +33,7 @@ def answer_question(message: str, context: dict[str, Any] | None = None) -> str:
     context = context or {}
 
     if "explain this prediction" in msg or "explain prediction" in msg:
-        return _explain_prediction(context.get("last_prediction"))
+        return _explain_prediction(context.get("last_prediction"), context.get("patient_id"))
 
     if "tp53" in msg:
         return FAQ["tp53"]
@@ -57,12 +57,18 @@ def answer_question(message: str, context: dict[str, Any] | None = None) -> str:
     )
 
 
-def _explain_prediction(pred: dict[str, Any] | None) -> str:
+def _explain_prediction(pred: dict[str, Any] | None, patient_id: str | None = None) -> str:
     if not pred:
-        return "No prediction in context. Run a prediction on the Patient Prediction page first."
+        msg = "No prediction in context. Run a prediction on the Patient Prediction page first."
+        if patient_id:
+            msg = f"No prediction in context for patient `{patient_id}`. Run a prediction on the Patient Prediction page first."
+        return msg
     if not pred.get("available", True):
-        return f"Last prediction unavailable: {pred.get('reason', 'unknown')}"
+        pid = pred.get("patient_id") or patient_id or "unknown"
+        return f"Patient `{pid}` — last prediction unavailable: {pred.get('reason', 'unknown')}"
+    pid = pred.get("patient_id") or patient_id or "unknown"
     return (
+        f"Patient: `{pid}`\n"
         f"Model: {pred['model']} | Target: {pred['target']}\n"
         f"Prediction: {pred['predicted_label_name']} (confidence {pred['confidence']:.2f})\n"
         f"Risk band: {pred['risk_band']} | Probability: {pred.get('probability', 0):.1%}"

@@ -7,7 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import streamlit as st
 
-from app.config import APP_VERSION, DISCLAIMER
+from app.config import APP_VERSION, DISCLAIMER, MODELS, MODEL_DESCRIPTIONS, MODELS_OVERVIEW
 
 
 def render() -> None:
@@ -18,12 +18,22 @@ def render() -> None:
         **Version:** {APP_VERSION}
 
         ONCOLENS is a multimodal machine learning platform for TCGA Lung Adenocarcinoma (LUAD)
-        that predicts overall survival status, progression-free survival status, and cancer stage
-        from gene expression, mutation, clinical, and histopathology data.
+        that predicts overall survival status, progression-free survival status, and cancer stage.
 
+        {MODELS_OVERVIEW}
+
+        ### Prediction Backends
+        """
+    )
+    for name in MODELS:
+        st.markdown(f"- **{name}:** {MODEL_DESCRIPTIONS[name]}")
+
+    st.markdown(
+        """
         ### Architecture
-        - **Level-0:** Random Forest + Logistic Regression per modality
-        - **Level-1:** Logistic Regression meta-learner on stacked probabilities
+        - **Standalone level-0:** Random Forest + Logistic Regression per modality (Expression, Mutation, Histopathology)
+        - **Fusion level-0:** Same per branch, plus Clinical inside multimodal stacks only
+        - **Level-1:** Logistic Regression meta-learner on stacked OOF probabilities
         - **Histopathology:** Frozen ResNet50 embeddings (2048-D), mean-pooled per patient
 
         ### Data Source
@@ -37,8 +47,8 @@ def render() -> None:
         ### Developer
         Soumya Ranjan Mohanty
 
-        {DISCLAIMER}
         """
+        + DISCLAIMER
     )
 
 

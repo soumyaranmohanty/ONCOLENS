@@ -9,6 +9,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+from app.config import POSITIVE_CLASS_LABEL, TARGET_TITLES
+
 
 def render_roc_curve(roc_data: dict[str, Any], title: str = "ROC Curve") -> None:
     fig = go.Figure()
@@ -41,6 +43,10 @@ def render_confusion_matrix(cm: np.ndarray, labels: list[str] | None = None, tit
 
 def render_comparison_bars(results: list[dict[str, Any]], target: str) -> None:
     rows = []
+    y_label = "Probability"
+    if target in POSITIVE_CLASS_LABEL:
+        y_label = f"P({POSITIVE_CLASS_LABEL[target]})"
+
     for r in results:
         if not r.get("available", True):
             rows.append({"model": r["model"], "probability": 0, "status": "unavailable"})
@@ -51,7 +57,8 @@ def render_comparison_bars(results: list[dict[str, Any]], target: str) -> None:
     import pandas as pd
 
     df = pd.DataFrame(rows)
-    fig = px.bar(df, x="model", y="probability", color="status", title=f"Model Comparison — {target}")
+    title = f"Model Comparison — {TARGET_TITLES.get(target, target)}"
+    fig = px.bar(df, x="model", y="probability", color="status", title=title, labels={"probability": y_label})
     st.plotly_chart(fig, use_container_width=True)
 
 

@@ -31,7 +31,7 @@ def _expression_highlights(patient: dict[str, Any], top_n: int = 5) -> list[str]
     if expr is None:
         return ["Expression data not provided."]
     row = expr.iloc[0].sort_values(ascending=False)
-    return [f"{gene}: {val:.2f}" for gene, val in row.head(top_n).items()]
+    return [f"{gene}: log1p(RSEM)={val:.2f}" for gene, val in row.head(top_n).items()]
 
 
 def generate_report_text(
@@ -40,7 +40,7 @@ def generate_report_text(
 ) -> str:
     pid = patient.get("patient_id", "Unknown")
     lines = [
-        "ONCOLENS AI Clinical Report",
+        "ONCOLENS Clinical Report (template-based)",
         "=" * 40,
         f"Patient ID: {pid}",
         "",
@@ -48,8 +48,10 @@ def generate_report_text(
         "-" * 20,
         f"Modalities available: {', '.join(k for k in patient if k not in ('patient_id', 'from_feature_store'))}",
         "",
-        "Gene Expression Highlights",
+        "Gene Expression (selected panel)",
         "-" * 20,
+        "  Top genes by log1p(RSEM) value in the model's selected gene panel",
+        "  (not model feature importance — values are log-transformed expression).",
     ]
     lines.extend(f"  • {h}" for h in _expression_highlights(patient))
     lines.extend(["", "Mutation Analysis", "-" * 20])

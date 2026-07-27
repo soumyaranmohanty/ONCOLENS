@@ -9,9 +9,9 @@ import pandas as pd
 import streamlit as st
 
 from app.components.charts import render_auc_comparison
+from app.components.model_help import render_models_overview
 from app.config import APP_VERSION, DISCLAIMER
 from app.inference.loaders import all_registries_summary
-from app.services.history import render_history
 
 
 def render() -> None:
@@ -21,10 +21,13 @@ def render() -> None:
     st.markdown(
         """
         ONCOLENS predicts **OS_STATUS**, **PFS_STATUS**, and **Stage** for lung adenocarcinoma
-        patients using multimodal late-fusion stacking across gene expression, mutation,
-        clinical, and histopathology data.
+        patients using five prediction backends: three standalone models (Expression, Mutation,
+        Histopathology) and two late-fusion multimodal stacks (3-Modality, 4-Modality).
+        Clinical data feeds the multimodal stacks only — there is no standalone Clinical model.
         """
     )
+
+    render_models_overview()
 
     col1, col2, col3 = st.columns(3)
     col1.metric("Cancer Type", "TCGA LUAD")
@@ -32,6 +35,10 @@ def render() -> None:
     col3.metric("4-Mod Cohort (provisional)", "44 patients")
 
     st.markdown("### Model Performance Summary")
+    st.caption(
+        "Test-set AUC from feature-store registries. Standalone rows are single-modality models; "
+        "3-Modality and 4-Modality are fusion stacks (Clinical is included only in fusion models)."
+    )
     summary = pd.DataFrame(all_registries_summary())
     if not summary.empty:
         display = summary[["model", "target", "test_auc", "total_patients", "model_type"]].copy()
@@ -43,16 +50,13 @@ def render() -> None:
     st.markdown("### Architecture")
     st.code(
         """
-Patient Data (Expression + Mutation + Clinical + Histopathology)
-        │
-        ▼
-Level-0 Models (RF + LR per modality) → OOF probabilities
-        │
-        ▼
-Level-1 Meta-Learner (Logistic Regression)
-        │
-        ▼
-Predictions: OS_STATUS | PFS_STATUS | Stage
+Standalone:  Expression | Mutation | Histopathology
+Fusion:      Expression + Mutation + Clinical  →  3-Modality meta-learner
+             Expression + Mutation + Clinical + Histopathology  →  4-Modality meta-learner
+
+Level-0: RF + LR per modality branch  →  OOF probabilities
+Level-1: Logistic Regression meta-learner
+Output:  OS_STATUS | PFS_STATUS | Stage
         """,
         language="text",
     )
@@ -68,8 +72,6 @@ Predictions: OS_STATUS | PFS_STATUS | Stage
     st.markdown("### Quick Links")
     st.page_link("pages/1_Patient_Prediction.py", label="Go to Patient Prediction", icon="🔬")
     st.page_link("pages/2_Model_Analytics.py", label="Go to Model Analytics", icon="📊")
-
-    render_history()
 
     st.caption(f"ONCOLENS v{APP_VERSION} | {DISCLAIMER}")
 

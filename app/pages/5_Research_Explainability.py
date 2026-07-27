@@ -9,6 +9,7 @@ import streamlit as st
 
 from app.components.charts import render_auc_comparison
 from app.components.metrics import render_disclaimer
+from app.components.patient_context import render_patient_context_banner
 from app.config import TARGETS
 from app.services.explain import (
     frequently_mutated_genes,
@@ -20,6 +21,12 @@ from app.services.explain import (
 
 def render() -> None:
     st.title("Research & Explainability")
+    st.markdown(
+        "Cohort-level analysis and comparison across the five prediction backends "
+        "(Expression, Mutation, Histopathology, 3-Modality, 4-Modality)."
+    )
+
+    render_patient_context_banner(cohort_level=True)
 
     target = st.selectbox("Target", TARGETS, key="explain_target")
 
@@ -38,6 +45,9 @@ def render() -> None:
         st.dataframe(mut_prev, hide_index=True, use_container_width=True)
 
     st.markdown("### Modality Performance Comparison")
+    st.caption(
+        "Test-set AUC by backend. Clinical contributes only inside 3-Modality and 4-Modality stacks."
+    )
     auc_df = modality_auc_comparison()
     render_auc_comparison(auc_df)
 

@@ -9,21 +9,30 @@ import streamlit as st
 
 from app.components.charts import render_confusion_matrix, render_roc_curve
 from app.components.metrics import render_disclaimer, render_metric_cards
-from app.config import MODELS, TARGETS
+from app.components.model_help import render_model_caption, render_models_overview
+from app.components.patient_context import render_patient_context_banner
+from app.config import MODELS, TARGETS, human_class_label
 from app.inference.loaders import four_mod_available
 from app.services.analytics import compute_metrics
 
 
 def render() -> None:
     st.title("Model Analytics")
-    st.markdown("Explore dataset info, metrics, and evaluation charts per model.")
+    st.markdown(
+        "Explore dataset info, test metrics, and evaluation charts for each of the five backends."
+    )
+    render_models_overview()
 
-    model_options = [m for m in MODELS if m != "4-Modality" or True]
-    model = st.selectbox("Model", model_options, key="analytics_model")
+    render_patient_context_banner(cohort_level=True)
+
+    model = st.selectbox("Model", MODELS, key="analytics_model")
+    render_model_caption(model)
     target = st.selectbox("Target", TARGETS, key="analytics_target")
 
     if model == "4-Modality" and not four_mod_available(target):
-        st.warning("4-Modality artifacts not available yet. Metrics will be unavailable.")
+        st.warning(
+            "4-Modality artifacts (`multimodal_model_v4/`) are not available for this target yet."
+        )
 
     metrics = compute_metrics(model, target)
     if not metrics.get("available"):
@@ -44,9 +53,9 @@ def render() -> None:
     st.markdown("### Confusion Matrix")
     labels = None
     if target == "Stage":
-        labels = ["1", "2", "3", "4"]
+        labels = [human_class_label(target, i) for i in range(1, 5)]
     elif target in ("OS_STATUS", "PFS_STATUS"):
-        labels = ["0", "1"]
+        labels = [human_class_label(target, i) for i in (0, 1)]
     render_confusion_matrix(metrics["confusion_matrix"], labels=labels)
 
     if metrics.get("roc_data"):

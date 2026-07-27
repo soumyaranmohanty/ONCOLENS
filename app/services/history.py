@@ -16,6 +16,8 @@ def init_history() -> None:
         st.session_state.last_prediction = None
     if "last_patient" not in st.session_state:
         st.session_state.last_patient = None
+    if "active_patient_id" not in st.session_state:
+        st.session_state.active_patient_id = None
 
 
 def append_prediction(result: dict[str, Any]) -> None:
@@ -39,6 +41,14 @@ def append_prediction(result: dict[str, Any]) -> None:
 def set_last_patient(patient: dict[str, Any]) -> None:
     init_history()
     st.session_state.last_patient = patient
+    st.session_state.active_patient_id = patient.get("patient_id")
+
+
+def clear_patient() -> None:
+    init_history()
+    st.session_state.last_patient = None
+    st.session_state.active_patient_id = None
+    st.session_state.last_prediction = None
 
 
 def history_dataframe() -> pd.DataFrame:
@@ -51,6 +61,7 @@ def history_dataframe() -> pd.DataFrame:
 def clear_history() -> None:
     st.session_state.prediction_history = []
     st.session_state.last_prediction = None
+    clear_patient()
 
 
 def render_history(expanded: bool = False) -> None:
@@ -59,7 +70,11 @@ def render_history(expanded: bool = False) -> None:
         st.info("No predictions yet. Run a prediction from the Patient Prediction page.")
         return
     with st.expander("Prediction History", expanded=expanded):
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        display = df.copy()
+        if "patient_id" in display.columns:
+            cols = ["patient_id", "timestamp", "target", "model", "prediction", "risk_band", "confidence", "probability"]
+            display = display[[c for c in cols if c in display.columns]]
+        st.dataframe(display, use_container_width=True, hide_index=True)
         if st.button("Clear history", key="clear_history_btn"):
             clear_history()
             st.rerun()

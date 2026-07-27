@@ -8,9 +8,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import pandas as pd
 import streamlit as st
 
+from app.config import MODELS, POSITIVE_CLASS_LABEL, TARGETS, TARGET_TITLES
 from app.components.charts import render_comparison_bars
 from app.components.metrics import render_disclaimer, render_prediction_card
-from app.config import MODELS, TARGETS
+from app.components.model_help import render_model_caption, render_models_overview
 from app.inference.loaders import four_mod_available
 from app.inference.patient import make_demo_patient, make_uploaded_patient
 from app.inference.predict import compare_all, predict_multimodal, predict_single
@@ -20,20 +21,29 @@ from app.services.history import append_prediction, set_last_patient
 
 def render() -> None:
     st.title("Patient Prediction")
-    st.markdown("Predict OS_STATUS, PFS_STATUS, or Stage using single or multimodal models.")
+    st.markdown(
+        "Predict OS_STATUS, PFS_STATUS, or Stage using standalone models or multimodal fusion stacks."
+    )
+    render_models_overview()
 
-    target = st.selectbox("Target", TARGETS, key="pred_target")
-    four_mod_ready = four_mod_available(target)
+    # ── Settings & filters ──────────────────────────────────────────────────
+    st.markdown("### Prediction settings")
 
-    model_options = MODELS + ["Compare All"]
-    model_choice = st.selectbox("Model", model_options, key="pred_model")
+    col_target, col_model = st.columns(2)
+    with col_target:
+        target = st.selectbox("Target", TARGETS, key="pred_target")
+    with col_model:
+        model_choice = st.selectbox("Model", MODELS + ["Compare All"], key="pred_model")
+        render_model_caption(model_choice)
 
-    if model_choice == "4-Modality" and not four_mod_ready:
-        st.info("4-Modality model is not yet trained. Train `multimodalv3` to enable. Histopathology standalone is available.")
+    if model_choice == "4-Modality" and not four_mod_available(target):
+        st.info(
+            "**4-Modality is not available yet.** The `multimodal_model_v4` bundle has not been "
+            "trained. You can still use the standalone Histopathology model or 3-Modality "
+            "(Expression + Mutation + Clinical) for this target."
+        )
 
     tab_demo, tab_upload = st.tabs(["TCGA Demo", "Upload CSVs"])
-
-    patient = None
 
     with tab_demo:
         ids = demo_patient_ids(target, four_mod=(model_choice == "4-Modality"))
@@ -41,9 +51,12 @@ def render() -> None:
             st.warning("No demo patients available for this cohort.")
         else:
             patient_id = st.selectbox("Patient ID", ids, key="demo_patient")
-            if st.button("Load demo patient", key="load_demo"):
-                patient = make_demo_patient(patient_id, target)
-                set_last_patient(patient)
+            if st.session_state.get("loaded_demo_id") != patient_id:
+                set_last_patient(make_demo_patient(patient_id, target))
+                st.session_state.loaded_demo_id = patient_id
+            if st.button("Reload demo patient", key="load_demo"):
+                set_last_patient(make_demo_patient(patient_id, target))
+                st.session_state.loaded_demo_id = patient_id
                 st.success(f"Loaded {patient_id}")
 
     with tab_upload:
@@ -55,66 +68,85 @@ def render() -> None:
         histo_f = st.file_uploader("Histopathology CSV (optional)", type=["csv"], key="up_histo")
 
         if st.button("Build patient from uploads", key="build_upload"):
-            patient = make_uploaded_patient(
-                pid,
-                expression=pd.read_csv(expr_f) if expr_f else None,
-                mutation=pd.read_csv(mut_f) if mut_f else None,
-                clinical=pd.read_csv(clin_f) if clin_f else None,
-                histopathology=pd.read_csv(histo_f) if histo_f else None,
+            set_last_patient(
+                make_uploaded_patient(
+                    pid,
+                    expression=pd.read_csv(expr_f) if expr_f else None,
+                    mutation=pd.read_csv(mut_f) if mut_f else None,
+                    clinical=pd.read_csv(clin_f) if clin_f else None,
+                    histopathology=pd.read_csv(histo_f) if histo_f else None,
+                )
             )
-            set_last_patient(patient)
+            st.session_state.loaded_demo_id = None
             st.success(f"Built patient {pid}")
 
-    if patient is None and "last_patient" in st.session_state and st.session_state.last_patient:
-        patient = st.session_state.last_patient
-
+    patient = st.session_state.get("last_patient")
     if patient is None:
-        st.info("Load a demo patient or upload CSVs to run predictions.")
+        st.info("Select a demo patient or upload CSVs above, then run a prediction.")
         render_disclaimer()
         return
 
-    st.markdown(f"**Active patient:** `{patient.get('patient_id')}`")
-    st.write("Modalities:", [k for k in patient if k not in ("patient_id", "from_feature_store")])
+    pid = patient.get("patient_id")
+    mods = [k for k in patient if k not in ("patient_id", "from_feature_store")]
+    st.success(f"Ready to predict for patient **`{pid}`** · modalities: {', '.join(mods) or 'None'}")
 
     if st.button("Run Prediction", type="primary", key="run_pred"):
         if model_choice == "Compare All":
             results = compare_all(target, patient)
-            st.session_state.last_results = results
-            for r in results:
-                append_prediction(r)
         elif model_choice in ("3-Modality", "4-Modality"):
-            result = predict_multimodal(target, patient, four_mod=(model_choice == "4-Modality"))
-            st.session_state.last_results = [result]
-            append_prediction(result)
+            results = [predict_multimodal(target, patient, four_mod=(model_choice == "4-Modality"))]
         else:
-            result = predict_single(model_choice, target, patient)
-            st.session_state.last_results = [result]
-            append_prediction(result)
+            results = [predict_single(model_choice, target, patient)]
 
-    if "last_results" in st.session_state and st.session_state.last_results:
-        results = [r for r in st.session_state.last_results if r.get("target") == target]
-        if results:
-            st.markdown("### Results")
-            for r in results:
-                render_prediction_card(r)
-            if len(results) > 1:
-                render_comparison_bars(results, target)
-                st.dataframe(
-                    pd.DataFrame(
-                        [
-                            {
-                                "model": r["model"],
-                                "prediction": r.get("predicted_label_name", "N/A"),
-                                "probability": r.get("probability"),
-                                "risk": r.get("risk_band"),
-                                "available": r.get("available", True),
-                            }
-                            for r in results
-                        ]
-                    ),
-                    hide_index=True,
-                    use_container_width=True,
-                )
+        st.session_state.last_results = results
+        st.session_state.last_results_patient_id = pid
+        st.session_state.last_results_target = target
+        for r in results:
+            append_prediction(r)
+
+    # ── Results (below settings) ──────────────────────────────────────────────
+    st.divider()
+    st.markdown("### Results")
+
+    stored_pid = st.session_state.get("last_results_patient_id")
+    stored_target = st.session_state.get("last_results_target")
+    results = st.session_state.get("last_results", [])
+
+    if not results or stored_pid != pid or stored_target != target:
+        st.info("No results yet for this patient and target. Click **Run Prediction** above.")
+        render_disclaimer()
+        return
+
+    st.caption(
+        f"Patient **`{pid}`** · {TARGET_TITLES.get(target, target)} · model **{model_choice}**"
+    )
+
+    for r in results:
+        render_prediction_card(r)
+
+    if len(results) > 1:
+        render_comparison_bars(results, target)
+        prob_col = "confidence (predicted stage)" if target == "Stage" else (
+            f"P({POSITIVE_CLASS_LABEL.get(target, 'event')})"
+        )
+        st.dataframe(
+            pd.DataFrame(
+                [
+                    {
+                        "patient_id": r.get("patient_id", pid),
+                        "model": r["model"],
+                        "outcome": TARGET_TITLES.get(target, target),
+                        "prediction": r.get("predicted_label_name", "N/A"),
+                        prob_col: r.get("probability"),
+                        "risk": r.get("risk_band"),
+                        "available": r.get("available", True),
+                    }
+                    for r in results
+                ]
+            ),
+            hide_index=True,
+            use_container_width=True,
+        )
 
     render_disclaimer()
 

@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import streamlit as st
 
 from app.components.metrics import render_disclaimer
+from app.components.patient_context import render_patient_context_banner
 from app.inference.predict import compare_all
 from app.services.history import init_history
 from app.services.treatment import generate_treatment_recommendations
@@ -18,21 +19,24 @@ def render() -> None:
     st.markdown("Educational decision-support based on predictions and biomarkers.")
 
     init_history()
-    patient = st.session_state.get("last_patient")
+    patient = render_patient_context_banner(require_patient=True)
     if patient is None:
-        st.info("Run a prediction first to get treatment suggestions.")
         render_disclaimer()
         return
 
+    pid = patient.get("patient_id")
     target = st.selectbox("Target context", ["OS_STATUS", "PFS_STATUS", "Stage"], key="treat_target")
 
     if st.button("Generate Recommendations", type="primary"):
         predictions = compare_all(target, patient)
         rec = generate_treatment_recommendations(patient, predictions)
         st.session_state.treatment_rec = rec
+        st.session_state.treatment_patient_id = pid
 
     rec = st.session_state.get("treatment_rec")
     if rec:
+        rec_pid = st.session_state.get("treatment_patient_id", pid)
+        st.markdown(f"### Recommendations for patient `{rec_pid}` · target **{target}**")
         st.markdown("### Risk Assessment")
         st.write(rec["risk_assessment"])
         st.markdown("### Likely Diagnosis")
