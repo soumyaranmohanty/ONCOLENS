@@ -5,6 +5,11 @@ uv.lock
 /.claude
 /.agents
 /.DS_Store
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
 /claude plans/gene_expression_plans
 /claude plans/mutation_plans
 /claude plans/*.md
