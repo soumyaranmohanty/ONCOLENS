@@ -14,6 +14,7 @@ from app.config import MODELS, POSITIVE_CLASS_LABEL, TARGET_TITLES
 from app.inference.loaders import four_mod_available
 from app.inference.predict import compare_all, predict_multimodal, predict_single
 from app.services.history import append_prediction
+from app.services.llm_agents import generate_llm_clinical_report, generate_llm_treatment_text, llm_available
 from app.services.report import generate_report_text, report_to_pdf
 from app.services.treatment import generate_treatment_recommendations
 
@@ -85,27 +86,48 @@ def render_predictions_tab(patient: dict[str, Any], target: str) -> None:
 
 
 def render_clinical_report_tab(patient: dict[str, Any], target: str) -> None:
-    st.markdown(
-        "Generate a **template-based** patient report from biomarker flags and model predictions. "
-        "This is not an LLM-generated narrative."
-    )
+    use_llm = False
+    if llm_available():
+        use_llm = st.toggle(
+            "Use AI-generated clinical report",
+            value=False,
+            key="report_use_llm",
+            help="Generate a narrative report from biomarkers, expression, and predictions.",
+        )
+    else:
+        st.caption("AI-generated reports are not available in this environment.")
+
+    if use_llm:
+        st.markdown(
+            "Generate an **AI clinical report** from biomarkers, expression highlights, "
+            "and model predictions."
+        )
+    else:
+        st.markdown(
+            "Generate a **template-based** patient report from biomarker flags and model predictions."
+        )
     st.caption(
         "Combines mutation flags, top log1p(RSEM) genes from the selected expression panel, "
         "histopathology embedding summary, and predictions from all five backends."
     )
-
-    with st.expander("LLM clinical report (coming soon)", expanded=False):
-        st.info(
-            "A future version will support an optional LLM agent for narrative clinical summaries. "
-            "That integration is not enabled in this release — use the template report below."
-        )
 
     pid = patient.get("patient_id")
 
     if st.button("Generate Report", type="primary", key="gen_report"):
         predictions = compare_all(target, patient)
         st.session_state.report_predictions = predictions
-        st.session_state.report_text = generate_report_text(patient, predictions)
+        if use_llm:
+            with st.spinner("Generating clinical report…"):
+                try:
+                    st.session_state.report_text = generate_llm_clinical_report(
+                        patient, predictions, target=target
+                    )
+                except Exception as exc:
+                    st.error(f"Report generation failed: {exc}")
+                    st.session_state.report_text = generate_report_text(patient, predictions)
+                    st.info("Fell back to template-based report.")
+        else:
+            st.session_state.report_text = generate_report_text(patient, predictions)
         st.session_state.report_patient_id = pid
         st.session_state.report_target = target
 
@@ -128,41 +150,73 @@ def render_clinical_report_tab(patient: dict[str, Any], target: str) -> None:
 
 
 def render_treatment_tab(patient: dict[str, Any], target: str) -> None:
-    st.markdown(
-        "Educational decision-support from **rule-based** biomarker and risk-band logic today. "
-        "An LLM treatment agent will replace this with narrative, patient-specific recommendations."
-    )
-    st.caption(
-        "Current output is deterministic: EGFR/KRAS/TMB flags, OS/PFS risk bands, and stage "
-        "predictions map to fixed suggestion lists — not model-generated clinical advice."
-    )
-
-    with st.expander("LLM treatment agent (coming soon)", expanded=False):
-        st.info(
-            "After you add your LLM integration to the codebase, this tab will call a "
-            "Treatment Recommendation agent that uses patient data, all five model predictions, "
-            "and structured biomarker context to produce personalized options, monitoring, "
-            "and questions for the care team."
+    use_llm = False
+    if llm_available():
+        use_llm = st.toggle(
+            "Use AI-generated treatment recommendations",
+            value=False,
+            key="treatment_use_llm",
+            help="Generate patient-specific educational treatment guidance.",
         )
+    else:
+        st.caption("AI-generated recommendations are not available in this environment.")
+
+    if use_llm:
+        st.markdown(
+            "Educational decision-support from **AI-generated** treatment recommendations."
+        )
+    else:
+        st.markdown(
+            "Educational decision-support from **rule-based** biomarker and risk-band logic."
+        )
+    st.caption(
+        "EGFR/KRAS/TMB flags, OS/PFS risk bands, and stage predictions inform suggestions. "
+        "Not a substitute for clinical judgment."
+    )
 
     pid = patient.get("patient_id")
 
     if st.button("Generate Recommendations", type="primary", key="gen_treatment"):
         predictions = compare_all(target, patient)
-        st.session_state.treatment_rec = generate_treatment_recommendations(patient, predictions)
+        if use_llm:
+            with st.spinner("Generating recommendations…"):
+                try:
+                    st.session_state.treatment_llm_text = generate_llm_treatment_text(
+                        patient, predictions, target=target
+                    )
+                    st.session_state.treatment_use_llm_result = True
+                except Exception as exc:
+                    st.error(f"Recommendation generation failed: {exc}")
+                    st.session_state.treatment_rec = generate_treatment_recommendations(
+                        patient, predictions
+                    )
+                    st.session_state.treatment_use_llm_result = False
+                    st.info("Fell back to rule-based recommendations.")
+        else:
+            st.session_state.treatment_rec = generate_treatment_recommendations(patient, predictions)
+            st.session_state.treatment_use_llm_result = False
         st.session_state.treatment_patient_id = pid
         st.session_state.treatment_target = target
 
     rec_pid = st.session_state.get("treatment_patient_id")
     rec_target = st.session_state.get("treatment_target")
-    rec = st.session_state.get("treatment_rec")
-    if not rec or rec_pid != pid or rec_target != target:
+    if rec_pid != pid or rec_target != target:
         st.info("Click **Generate Recommendations** for the active patient and target.")
         return
 
     st.markdown(
         f"### Recommendations for patient `{rec_pid}` · {TARGET_TITLES.get(target, target)}"
     )
+
+    if st.session_state.get("treatment_use_llm_result") and st.session_state.get("treatment_llm_text"):
+        st.markdown(st.session_state.treatment_llm_text)
+        return
+
+    rec = st.session_state.get("treatment_rec")
+    if not rec:
+        st.info("Click **Generate Recommendations** for the active patient and target.")
+        return
+
     st.markdown("#### Risk Assessment")
     st.write(rec["risk_assessment"])
     st.markdown("#### Likely Diagnosis")

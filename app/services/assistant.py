@@ -1,75 +1,83 @@
-"""Rule-based virtual assistant (Level 1)."""
+"""Virtual AI Assistant — scoped to ONCOLENS / oncology."""
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
-FAQ = {
-    "tp53": (
-        "TP53 is a tumor suppressor gene. Mutations in TP53 are common in LUAD and are "
-        "associated with more aggressive disease and poorer prognosis."
-    ),
-    "pfs": (
-        "PFS (Progression-Free Survival) measures time without disease progression after treatment. "
-        "OS (Overall Survival) measures time until death from any cause."
-    ),
-    "roc": (
-        "ROC-AUC measures how well a model separates classes across thresholds. "
-        "AUC=0.5 is random; higher values indicate better discrimination."
-    ),
-    "stage": (
-        "AJCC pathologic stage (I–IV) describes extent of disease based on tumor size, "
-        "node involvement, and metastasis."
-    ),
-    "modalities": (
-        "ONCOLENS combines Gene Expression, Mutation, Clinical, and Histopathology modalities "
-        "using late-fusion stacking for survival and staging prediction."
-    ),
-}
+from llm.prompts import OUT_OF_SCOPE_REPLY
+
+# Fast pre-check for clearly off-topic queries (agent also enforces scope via system prompt).
+_OFF_TOPIC_PATTERN = re.compile(
+    r"\b("
+    r"weather|forecast|temperature|rain|snow|"
+    r"cricket|football|soccer|basketball|nba|nfl|world cup|"
+    r"python code|javascript|programming|write code|debug|"
+    r"recipe|cooking|movie|netflix|song|music|celebrity|"
+    r"stock market|crypto|bitcoin|politics|election|"
+    r"homework|math problem|calculate \d|"
+    r"capital of|president of|who won"
+    r")\b",
+    re.IGNORECASE,
+)
+
+_IN_SCOPE_PATTERN = re.compile(
+    r"\b("
+    r"oncolens|oncology|oncolog|cancer|cancerous|tumor|tumour|carcinoma|luad|lung|"
+    r"adenocarcinoma|biomarker|mutation|mutant|gene|expression|histopath|"
+    r"predict|prediction|model|modality|multimodal|survival|prognos|"
+    r"tp53|egfr|kras|alk|stk11|tmb|stage|staging|"
+    r"\bos\b|\bpfs\b|progression|deceased|alive|"
+    r"roc|auc|metric|confidence|risk|"
+    r"treatment|therapy|chemo|immuno|targeted|drug|nccn|"
+    r"patient|tcga|clinical|patholog|"
+    r"explain this prediction|explain prediction|"
+    r"this project|this app|this tool"
+    r")\b",
+    re.IGNORECASE,
+)
 
 
-def answer_question(message: str, context: dict[str, Any] | None = None) -> str:
-    msg = message.lower().strip()
+def _obviously_out_of_scope(message: str) -> bool:
+    """Return True when the message clearly has no oncology/ONCOLENS relevance."""
+    text = message.strip()
+    if not text:
+        return True
+    if _OFF_TOPIC_PATTERN.search(text):
+        return True
+    if _IN_SCOPE_PATTERN.search(text):
+        return False
+    # Very short greetings are allowed through so the agent can respond in scope.
+    if text.lower() in {"hi", "hello", "hey", "thanks", "thank you", "bye"}:
+        return False
+    return True
+
+
+def answer_question(
+    message: str,
+    context: dict[str, Any] | None = None,
+    *,
+    chat_history: list[dict[str, str]] | None = None,
+) -> str:
+    """Answer a user message using the ONCOLENS assistant."""
+    from app.services.llm_agents import generate_llm_assistant_reply, llm_available
+
     context = context or {}
 
-    if "explain this prediction" in msg or "explain prediction" in msg:
-        return _explain_prediction(context.get("last_prediction"), context.get("patient_id"))
+    if not llm_available():
+        return "The AI assistant is not available. Please try again later."
 
-    if "tp53" in msg:
-        return FAQ["tp53"]
-    if "pfs" in msg or "progression" in msg:
-        return FAQ["pfs"]
-    if "roc" in msg or "auc" in msg:
-        return FAQ["roc"]
-    if "stage" in msg:
-        return FAQ["stage"]
-    if "modality" in msg or "multimodal" in msg:
-        return FAQ["modalities"]
-    if "treatment" in msg:
-        return (
-            "Treatment recommendations in ONCOLENS are educational only. "
-            "Discuss all options with a qualified oncologist."
+    if _obviously_out_of_scope(message):
+        return OUT_OF_SCOPE_REPLY
+
+    try:
+        return generate_llm_assistant_reply(
+            message,
+            chat_history=chat_history,
+            patient=context.get("patient"),
+            last_prediction=context.get("last_prediction"),
+            default_target=context.get("default_target", "OS_STATUS"),
+            prediction_history=context.get("prediction_history"),
         )
-
-    return (
-        "I can help explain TP53 mutations, PFS vs OS, ROC curves, staging, modalities, "
-        "or your latest prediction. Try: 'Explain this prediction' or 'What is PFS?'"
-    )
-
-
-def _explain_prediction(pred: dict[str, Any] | None, patient_id: str | None = None) -> str:
-    if not pred:
-        msg = "No prediction in context. Run a prediction on the Patient Prediction page first."
-        if patient_id:
-            msg = f"No prediction in context for patient `{patient_id}`. Run a prediction on the Patient Prediction page first."
-        return msg
-    if not pred.get("available", True):
-        pid = pred.get("patient_id") or patient_id or "unknown"
-        return f"Patient `{pid}` — last prediction unavailable: {pred.get('reason', 'unknown')}"
-    pid = pred.get("patient_id") or patient_id or "unknown"
-    return (
-        f"Patient: `{pid}`\n"
-        f"Model: {pred['model']} | Target: {pred['target']}\n"
-        f"Prediction: {pred['predicted_label_name']} (confidence {pred['confidence']:.2f})\n"
-        f"Risk band: {pred['risk_band']} | Probability: {pred.get('probability', 0):.1%}"
-    )
+    except Exception as exc:
+        return f"The assistant encountered an error: {exc}. Please try again later."

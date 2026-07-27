@@ -1,28 +1,44 @@
+"""Local LLM inference via Ollama — shared config for ONCOLENS agents."""
+
+from __future__ import annotations
+
+import os
+from functools import lru_cache
+from typing import Any
+
 from langchain_ollama import ChatOllama
 
-from langchain.messages import SystemMessage, HumanMessage
+DEFAULT_MODEL = os.getenv("ONCOLENS_LLM_MODEL", "gemma4:26b")
+DEFAULT_BASE_URL = os.getenv("ONCOLENS_OLLAMA_URL", "http://localhost:11434")
+
+DEFAULT_LLM_KWARGS: dict[str, Any] = {
+    "temperature": 0,
+    "top_p": 0.9,
+    "top_k": 40,
+    "num_predict": 2048,
+    "repeat_penalty": 1.1,
+}
 
 
-llm_mistral = ChatOllama(
-    
-    model="mistral:7b",
-    temperature=0,
-    base_url="http://localhost:11434",  # Default Ollama server URL
-    top_p=0.9,                          # Nucleus sampling
-    top_k=40,                           # Top-k sampling
-    num_predict=256,                    # Max tokens to generate
-    repeat_penalty=1.1, 
+@lru_cache(maxsize=4)
+def get_llm(
+    model: str | None = None,
+    *,
+    base_url: str | None = None,
+    num_predict: int | None = None,
+    **overrides: Any,
+) -> ChatOllama:
+    """Return a cached ChatOllama instance for agent inference."""
+    kwargs = {**DEFAULT_LLM_KWARGS, **overrides}
+    if num_predict is not None:
+        kwargs["num_predict"] = num_predict
 
-)
+    return ChatOllama(
+        model=model or DEFAULT_MODEL,
+        base_url=base_url or DEFAULT_BASE_URL,
+        **kwargs,
+    )
 
-llm_gpt = ChatOllama(
-    
-    model="gpt-oss:20b",
-    temperature=0,
-    base_url="http://localhost:11434",  # Default Ollama server URL
-    top_p=0.9,                          # Nucleus sampling
-    top_k=40,                           # Top-k sampling
-    num_predict=256,                    # Max tokens to generate
-    repeat_penalty=1.1, 
 
-)
+# Primary model used by clinical-report and treatment ReAct agents.
+llm_gemma = get_llm()
