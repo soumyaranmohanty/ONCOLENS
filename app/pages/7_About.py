@@ -7,49 +7,54 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import streamlit as st
 
-from app.config import APP_VERSION, DISCLAIMER, MODELS, MODEL_DESCRIPTIONS, MODELS_OVERVIEW
+from app.components.layout import render_disclaimer, section
+from app.config import APP_VERSION, MODELS, MODEL_DESCRIPTIONS, MODELS_OVERVIEW
 
 
 def render() -> None:
-    st.title("About ONCOLENS")
+    section("About ONCOLENS", f"Version {APP_VERSION} · TCGA LUAD multimodal prediction platform")
 
-    st.markdown(
-        f"""
-        **Version:** {APP_VERSION}
+    left, right = st.columns(2)
 
-        ONCOLENS is a multimodal machine learning platform for TCGA Lung Adenocarcinoma (LUAD)
-        that predicts overall survival status, progression-free survival status, and cancer stage.
+    with left:
+        with st.container(border=True):
+            st.markdown(MODELS_OVERVIEW)
+            st.markdown("**Prediction backends**")
+            for name in MODELS:
+                st.markdown(f"- **{name}:** {MODEL_DESCRIPTIONS[name]}")
 
-        {MODELS_OVERVIEW}
+    with right:
+        with st.container(border=True):
+            st.markdown("**Architecture**")
+            st.markdown(
+                """
+                - **Standalone level-0:** RF + LR per modality (Expression, Mutation, Histopathology)
+                - **Fusion level-0:** Clinical branch inside multimodal stacks only
+                - **Level-1:** Logistic Regression meta-learner on stacked OOF probabilities
+                - **Histopathology:** Frozen ResNet50 embeddings (2048-D), mean-pooled per patient
+                """
+            )
+            st.markdown("**Data sources**")
+            st.markdown(
+                """
+                - [TCGA LUAD](https://portal.gdc.cancer.gov/projects/TCGA-LUAD) via GDC
+                - [cBioPortal TCGA Pan-Cancer Atlas](https://www.cbioportal.org/)
+                """
 
-        ### Prediction Backends
-        """
-    )
-    for name in MODELS:
-        st.markdown(f"- **{name}:** {MODEL_DESCRIPTIONS[name]}")
+            )
+            st.markdown("**Developer**")
+            st.markdown("Soumya Ranjan Mohanty")
 
-    st.markdown(
-        """
-        ### Architecture
-        - **Standalone level-0:** Random Forest + Logistic Regression per modality (Expression, Mutation, Histopathology)
-        - **Fusion level-0:** Same per branch, plus Clinical inside multimodal stacks only
-        - **Level-1:** Logistic Regression meta-learner on stacked OOF probabilities
-        - **Histopathology:** Frozen ResNet50 embeddings (2048-D), mean-pooled per patient
+    with st.container(border=True):
+        st.markdown("**References**")
+        st.markdown(
+            """
+            - TCGA Research Network — comprehensive molecular profiling of lung adenocarcinoma
+            - Late-fusion multimodal stacking for survival and staging prediction
+            """
+        )
 
-        ### Data Source
-        - [TCGA LUAD](https://portal.gdc.cancer.gov/projects/TCGA-LUAD) via GDC
-        - [cBioPortal TCGA Pan-Cancer Atlas](https://www.cbioportal.org/)
-
-        ### References
-        - TCGA Research Network. Comprehensive molecular profiling of lung adenocarcinoma.
-        - Late-fusion multimodal stacking for survival and staging prediction.
-
-        ### Developer
-        Soumya Ranjan Mohanty
-
-        """
-        + DISCLAIMER
-    )
+    render_disclaimer()
 
 
 render()

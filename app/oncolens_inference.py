@@ -15,6 +15,7 @@ _spec.loader.exec_module(_path_mod)
 import streamlit as st
 
 from app.components.patient_context import render_patient_context_sidebar
+from app.components.theme import inject_global_css
 
 st.set_page_config(
     page_title="ONCOLENS",
@@ -22,6 +23,8 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+inject_global_css()
 
 with st.sidebar:
     render_patient_context_sidebar()

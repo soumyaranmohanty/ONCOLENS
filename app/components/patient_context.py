@@ -48,20 +48,32 @@ def render_patient_context_sidebar() -> None:
     st.markdown("---")
     st.markdown("**Session patient**")
     if patient is None:
-        st.caption("No patient selected")
-        st.caption("Load one on Patient Prediction")
+        st.markdown(
+            '<div class="oncolens-sidebar-card">'
+            '<span style="color:#64748b;">No patient loaded</span><br/>'
+            '<span style="font-size:0.72rem;color:#94a3b8;">Open Patient Prediction</span>'
+            "</div>",
+            unsafe_allow_html=True,
+        )
         return
 
     pid = patient.get("patient_id", "Unknown")
-    st.markdown(f"`{pid}`")
     source = "TCGA Demo" if patient.get("from_feature_store") else "Upload"
-    st.caption(f"Source: {source}")
-    st.caption(f"Modalities: {', '.join(_modalities(patient)) or 'None'}")
+    mods = ", ".join(_modalities(patient)) or "None"
+    pred_line = ""
     if pred and pred.get("available", True):
-        st.caption(
-            f"Last: {pred.get('model')} → {pred.get('predicted_label_name')} "
-            f"({pred.get('target')})"
+        pred_line = (
+            f"<br/><span style='font-size:0.72rem;color:#64748b;'>"
+            f"Last: {pred.get('model')} → {pred.get('predicted_label_name')}"
+            f"</span>"
         )
+    st.markdown(
+        f'<div class="oncolens-sidebar-card">'
+        f'<span class="oncolens-sidebar-id">{pid}</span><br/>'
+        f'<span style="font-size:0.72rem;color:#64748b;">{source} · {mods}</span>'
+        f"{pred_line}</div>",
+        unsafe_allow_html=True,
+    )
 
 
 def render_patient_context_banner(

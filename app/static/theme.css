@@ -1,0 +1,333 @@
+/* ONCOLENS clinical light theme — scoped class names only */
+
+.oncolens-hero {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 55%, #115e59 100%);
+  border-radius: 12px;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.25rem;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
+}
+
+.oncolens-hero h1 {
+  color: #ffffff !important;
+  font-size: 1.85rem !important;
+  font-weight: 700 !important;
+  margin: 0 0 0.35rem 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.oncolens-hero p {
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 1rem;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.5;
+}
+
+.oncolens-hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.oncolens-badge {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.oncolens-badge--hero {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.oncolens-badge--muted {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.oncolens-badge--primary {
+  background: #ccfbf1;
+  color: #0f766e;
+  border: 1px solid #99f6e4;
+}
+
+.oncolens-badge--risk-low {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.oncolens-badge--risk-medium {
+  background: #ffedd5;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+}
+
+.oncolens-badge--risk-high {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.oncolens-badge--soon {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px dashed #cbd5e1;
+}
+
+.oncolens-badge--ai-on {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.oncolens-badge--ai-off {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.oncolens-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.oncolens-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 0.35rem 0;
+}
+
+.oncolens-card-sub {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.oncolens-patient-id {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f766e;
+  font-family: ui-monospace, monospace;
+}
+
+.oncolens-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.oncolens-chip {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: #f0fdfa;
+  color: #0f766e;
+  border: 1px solid #99f6e4;
+}
+
+.oncolens-chip--clinical {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+.oncolens-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0 1.25rem 0;
+}
+
+.oncolens-step {
+  flex: 1;
+  min-width: 140px;
+  text-align: center;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #64748b;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+.oncolens-step--active {
+  color: #0f766e;
+  background: #f0fdfa;
+  border-color: #0d9488;
+  font-weight: 600;
+}
+
+.oncolens-step--done {
+  color: #166534;
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.oncolens-workflow-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0.5rem 0 1rem 0;
+}
+
+.oncolens-workflow-item {
+  flex: 1;
+  min-width: 120px;
+  text-align: center;
+  padding: 0.65rem;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  font-size: 0.8rem;
+}
+
+.oncolens-workflow-num {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0d9488;
+  margin-bottom: 0.2rem;
+}
+
+.oncolens-quick-link {
+  display: block;
+  padding: 1rem 1.1rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  text-decoration: none !important;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  margin-bottom: 0.5rem;
+}
+
+.oncolens-quick-link:hover {
+  border-color: #0d9488;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.12);
+}
+
+.oncolens-quick-link-title {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 0.95rem;
+}
+
+.oncolens-quick-link-desc {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+.oncolens-arch-col {
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  min-height: 140px;
+}
+
+.oncolens-arch-col h4 {
+  color: #0d9488;
+  font-size: 0.88rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.oncolens-arch-col ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.78rem;
+  color: #475569;
+  line-height: 1.55;
+}
+
+.oncolens-report-preview {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  max-height: 420px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.oncolens-disclaimer {
+  margin-top: 1.5rem;
+  padding: 0.65rem 0.85rem;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  line-height: 1.45;
+}
+
+.oncolens-sidebar-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+}
+
+.oncolens-sidebar-id {
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  color: #0f766e;
+  font-size: 0.82rem;
+}
+
+.oncolens-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #64748b;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.oncolens-pred-metric {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0d9488;
+  line-height: 1.1;
+}
+
+.oncolens-pred-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.oncolens-interpret {
+  background: #f0fdfa;
+  border-left: 3px solid #0d9488;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+}
+
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+  background: #f0fdfa;
+  border-radius: 10px;
+  border: 1px solid #ccfbf1;
+}

@@ -7,12 +7,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import streamlit as st
 
-from app.components.metrics import render_disclaimer
-from app.components.patient_context import (
-    get_active_patient,
-    get_active_patient_id,
-    render_patient_context_banner,
-)
+from app.components.cards import compact_patient_chip
+from app.components.layout import ai_status_banner, empty_state, render_disclaimer, section
 from app.services.assistant import answer_question
 from app.services.history import init_history
 from app.services.llm_agents import llm_available
@@ -21,44 +17,50 @@ from app.services.llm_agents import llm_available
 def _assistant_context() -> dict:
     init_history()
     return {
-        "patient": get_active_patient(),
+        "patient": st.session_state.get("last_patient"),
         "last_prediction": st.session_state.get("last_prediction"),
         "default_target": st.session_state.get("pred_target", "OS_STATUS"),
         "prediction_history": st.session_state.get("prediction_history", []),
     }
 
 
+def _last_pred_line() -> str | None:
+    pred = st.session_state.get("last_prediction")
+    if pred and pred.get("available", True):
+        return f"{pred.get('model')} → {pred.get('predicted_label_name')}"
+    return None
+
+
 def render() -> None:
-    st.title("Virtual AI Assistant")
-    st.markdown(
-        "Ask questions about **ONCOLENS**, LUAD biomarkers, model predictions, and patient session data."
+    section(
+        "Virtual AI Assistant",
+        "Ask about ONCOLENS, LUAD biomarkers, model predictions, and patient session data.",
     )
 
-    if not llm_available():
-        st.warning("The AI assistant is not available in this environment.")
-    else:
-        st.caption("Only ONCOLENS and cancer/oncology-related questions are answered.")
+    ai_status_banner(llm_available())
 
     init_history()
-    render_patient_context_banner()
-
-    pid = get_active_patient_id()
-    if pid:
-        st.caption(
-            f"Active patient **`{pid}`** — ask about this patient's biomarkers, predictions, or models."
-        )
+    patient = st.session_state.get("last_patient")
+    pid = patient.get("patient_id") if patient else None
+    compact_patient_chip(pid, _last_pred_line())
 
     if "chat_messages" not in st.session_state:
         greeting = (
-            "Hello! I'm the ONCOLENS assistant. Ask me about TP53, PFS, ROC-AUC, modalities, "
+            "Hello! I'm the ONCOLENS assistant. Ask about TP53, PFS, ROC-AUC, modalities, "
             "or say **Explain this prediction** after running a model."
         )
         if pid:
             greeting = (
-                f"Hello! Active patient is **`{pid}`**. Ask me about biomarkers, predictions, "
+                f"Hello! Active patient is **`{pid}`**. Ask about biomarkers, predictions, "
                 "or ONCOLENS models."
             )
         st.session_state.chat_messages = [{"role": "assistant", "content": greeting}]
+
+    if len(st.session_state.chat_messages) <= 1:
+        empty_state(
+            "Start a conversation",
+            "Ask about biomarkers, predictions, or model metrics.",
+        )
 
     for msg in st.session_state.chat_messages:
         with st.chat_message(msg["role"]):
@@ -76,7 +78,7 @@ def render() -> None:
         st.session_state.chat_messages.append({"role": "assistant", "content": response})
         st.rerun()
 
-    st.markdown("**Suggested questions:**")
+    st.markdown("**Suggested questions**")
     suggestions = [
         "Explain TP53 mutation",
         "What is PFS?",
@@ -84,17 +86,19 @@ def render() -> None:
         "Explain ROC-AUC",
         "What are the modalities?",
     ]
-    for s in suggestions:
-        if st.button(s, key=f"suggest_{s}"):
-            st.session_state.chat_messages.append({"role": "user", "content": s})
-            with st.spinner("Thinking…"):
-                response = answer_question(
-                    s,
-                    _assistant_context(),
-                    chat_history=st.session_state.chat_messages[:-1],
-                )
-            st.session_state.chat_messages.append({"role": "assistant", "content": response})
-            st.rerun()
+    s_cols = st.columns(3)
+    for i, s in enumerate(suggestions):
+        with s_cols[i % 3]:
+            if st.button(s, key=f"suggest_{s}", use_container_width=True):
+                st.session_state.chat_messages.append({"role": "user", "content": s})
+                with st.spinner("Thinking…"):
+                    response = answer_question(
+                        s,
+                        _assistant_context(),
+                        chat_history=st.session_state.chat_messages[:-1],
+                    )
+                st.session_state.chat_messages.append({"role": "assistant", "content": response})
+                st.rerun()
 
     render_disclaimer()
 

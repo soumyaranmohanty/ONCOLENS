@@ -8,8 +8,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import pandas as pd
 import streamlit as st
 
-from app.components.metrics import render_disclaimer
-from app.components.model_help import render_models_overview
+from app.components.cards import patient_summary_card
+from app.components.layout import render_disclaimer, section, workflow_steps
 from app.components.patient_workflow import (
     render_clinical_report_tab,
     render_predictions_tab,
@@ -24,53 +24,61 @@ from app.services.history import init_history, set_last_patient
 def render() -> None:
     init_history()
 
-    st.title("Patient Prediction")
-    st.markdown(
-        "Load a patient, run model predictions, and generate clinical reports and "
-        "treatment recommendations in one workflow."
+    section(
+        "Patient Prediction",
+        "Load a patient, run model predictions, and generate clinical reports and treatment guidance.",
     )
-    render_models_overview()
 
-    st.markdown("### Patient & target")
+    patient = st.session_state.get("last_patient")
+    has_results = bool(st.session_state.get("last_results"))
+    active_step = 2 if has_results else (1 if patient else 0)
+    workflow_steps(
+        [("1", "Load patient"), ("2", "Choose target"), ("3", "Run analysis")],
+        active_step,
+    )
 
-    target = st.selectbox("Target", TARGETS, key="pred_target")
+    col_target, _ = st.columns([1, 2])
+    with col_target:
+        target = st.selectbox("Target", TARGETS, key="pred_target")
 
-    tab_demo, tab_upload = st.tabs(["TCGA Demo", "Upload CSVs"])
+    col_demo, col_upload = st.columns(2)
 
-    with tab_demo:
-        ids = demo_patient_ids(target, four_mod=False)
-        if not ids:
-            st.warning("No demo patients available for this cohort.")
-        else:
-            patient_id = st.selectbox("Patient ID", ids, key="demo_patient")
-            if st.session_state.get("loaded_demo_id") != patient_id:
-                set_last_patient(make_demo_patient(patient_id, target))
-                st.session_state.loaded_demo_id = patient_id
-            if st.button("Reload demo patient", key="load_demo"):
-                set_last_patient(make_demo_patient(patient_id, target))
-                st.session_state.loaded_demo_id = patient_id
-                st.success(f"Loaded {patient_id}")
+    with col_demo:
+        with st.container(border=True):
+            st.markdown("**TCGA Demo**")
+            ids = demo_patient_ids(target, four_mod=False)
+            if not ids:
+                st.warning("No demo patients for this cohort.")
+            else:
+                patient_id = st.selectbox("Patient ID", ids, key="demo_patient")
+                if st.session_state.get("loaded_demo_id") != patient_id:
+                    set_last_patient(make_demo_patient(patient_id, target))
+                    st.session_state.loaded_demo_id = patient_id
+                if st.button("Reload demo patient", key="load_demo", use_container_width=True):
+                    set_last_patient(make_demo_patient(patient_id, target))
+                    st.session_state.loaded_demo_id = patient_id
+                    st.rerun()
 
-    with tab_upload:
-        st.markdown("Upload CSV files with one patient row. Include `PATIENT_ID` or `patient_id` column.")
-        pid = st.text_input("Patient ID", value="UPLOAD-001", key="upload_pid")
-        expr_f = st.file_uploader("Gene Expression CSV", type=["csv"], key="up_expr")
-        mut_f = st.file_uploader("Mutation CSV", type=["csv"], key="up_mut")
-        clin_f = st.file_uploader("Clinical CSV", type=["csv"], key="up_clin")
-        histo_f = st.file_uploader("Histopathology CSV (optional)", type=["csv"], key="up_histo")
-
-        if st.button("Build patient from uploads", key="build_upload"):
-            set_last_patient(
-                make_uploaded_patient(
-                    pid,
-                    expression=pd.read_csv(expr_f) if expr_f else None,
-                    mutation=pd.read_csv(mut_f) if mut_f else None,
-                    clinical=pd.read_csv(clin_f) if clin_f else None,
-                    histopathology=pd.read_csv(histo_f) if histo_f else None,
+    with col_upload:
+        with st.container(border=True):
+            st.markdown("**Upload CSVs**")
+            pid = st.text_input("Patient ID", value="UPLOAD-001", key="upload_pid")
+            expr_f = st.file_uploader("Expression", type=["csv"], key="up_expr")
+            mut_f = st.file_uploader("Mutation", type=["csv"], key="up_mut")
+            clin_f = st.file_uploader("Clinical", type=["csv"], key="up_clin")
+            histo_f = st.file_uploader("Histopathology (optional)", type=["csv"], key="up_histo")
+            if st.button("Build from uploads", key="build_upload", use_container_width=True):
+                set_last_patient(
+                    make_uploaded_patient(
+                        pid,
+                        expression=pd.read_csv(expr_f) if expr_f else None,
+                        mutation=pd.read_csv(mut_f) if mut_f else None,
+                        clinical=pd.read_csv(clin_f) if clin_f else None,
+                        histopathology=pd.read_csv(histo_f) if histo_f else None,
+                    )
                 )
-            )
-            st.session_state.loaded_demo_id = None
-            st.success(f"Built patient {pid}")
+                st.session_state.loaded_demo_id = None
+                st.rerun()
 
     patient = st.session_state.get("last_patient")
     if patient is None:
@@ -81,11 +89,7 @@ def render() -> None:
     pid = patient.get("patient_id")
     mods = [k for k in patient if k not in ("patient_id", "from_feature_store")]
     source = "TCGA Demo" if patient.get("from_feature_store") else "Uploaded CSV"
-    st.success(
-        f"Active patient **`{pid}`** ({source}) · data loaded: {', '.join(mods) or 'None'}"
-    )
-
-    st.divider()
+    patient_summary_card(pid, source, mods)
 
     tab_predictions, tab_report, tab_treatment = st.tabs(
         ["Predictions", "AI Clinical Report", "Treatment Recommendation"]

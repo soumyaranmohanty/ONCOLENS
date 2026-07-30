@@ -7,7 +7,9 @@ from typing import Any
 import pandas as pd
 import streamlit as st
 
+from app.components.cards import report_section_card
 from app.components.charts import render_comparison_bars
+from app.components.layout import empty_state, report_preview
 from app.components.metrics import render_prediction_card
 from app.components.model_help import render_model_caption
 from app.config import MODELS, POSITIVE_CLASS_LABEL, TARGET_TITLES
@@ -21,17 +23,19 @@ from app.services.treatment import generate_treatment_recommendations
 
 def render_predictions_tab(patient: dict[str, Any], target: str) -> None:
     pid = patient.get("patient_id")
-    model_choice = st.selectbox("Model", MODELS + ["Compare All"], key="pred_model")
+    c1, c2 = st.columns(2)
+    with c1:
+        model_choice = st.selectbox("Model", MODELS + ["Compare All"], key="pred_model")
+    with c2:
+        st.caption(TARGET_TITLES.get(target, target))
     render_model_caption(model_choice)
 
     if model_choice == "4-Modality" and not four_mod_available(target):
         st.info(
-            "**4-Modality is not available yet.** The `multimodal_model_v4` bundle has not been "
-            "trained. You can still use the standalone Histopathology model or 3-Modality "
-            "(Expression + Mutation + Clinical) for this target."
+            "**4-Modality is not available yet.** Use standalone Histopathology or 3-Modality instead."
         )
 
-    if st.button("Run Prediction", type="primary", key="run_pred"):
+    if st.button("Run Prediction", type="primary", key="run_pred", use_container_width=True):
         if model_choice == "Compare All":
             results = compare_all(target, patient)
         elif model_choice in ("3-Modality", "4-Modality"):
@@ -50,12 +54,10 @@ def render_predictions_tab(patient: dict[str, Any], target: str) -> None:
     results = st.session_state.get("last_results", [])
 
     if not results or stored_pid != pid or stored_target != target:
-        st.info("No results yet for this patient and target. Click **Run Prediction** above.")
+        empty_state("No results yet", "Click **Run Prediction** above.")
         return
 
-    st.caption(
-        f"Patient **`{pid}`** · {TARGET_TITLES.get(target, target)} · model **{model_choice}**"
-    )
+    st.caption(f"{TARGET_TITLES.get(target, target)} · **{model_choice}**")
 
     for r in results:
         render_prediction_card(r)
@@ -65,55 +67,45 @@ def render_predictions_tab(patient: dict[str, Any], target: str) -> None:
         prob_col = "confidence (predicted stage)" if target == "Stage" else (
             f"P({POSITIVE_CLASS_LABEL.get(target, 'event')})"
         )
-        st.dataframe(
-            pd.DataFrame(
-                [
-                    {
-                        "patient_id": r.get("patient_id", pid),
-                        "model": r["model"],
-                        "outcome": TARGET_TITLES.get(target, target),
-                        "prediction": r.get("predicted_label_name", "N/A"),
-                        prob_col: r.get("probability"),
-                        "risk": r.get("risk_band"),
-                        "available": r.get("available", True),
-                    }
-                    for r in results
-                ]
-            ),
-            hide_index=True,
-            use_container_width=True,
-        )
+        with st.container(border=True):
+            st.dataframe(
+                pd.DataFrame(
+                    [
+                        {
+                            "patient_id": r.get("patient_id", pid),
+                            "model": r["model"],
+                            "outcome": TARGET_TITLES.get(target, target),
+                            "prediction": r.get("predicted_label_name", "N/A"),
+                            prob_col: r.get("probability"),
+                            "risk": r.get("risk_band"),
+                            "available": r.get("available", True),
+                        }
+                        for r in results
+                    ]
+                ),
+                hide_index=True,
+                use_container_width=True,
+            )
 
 
 def render_clinical_report_tab(patient: dict[str, Any], target: str) -> None:
-    use_llm = False
-    if llm_available():
-        use_llm = st.toggle(
-            "Use AI-generated clinical report",
-            value=False,
-            key="report_use_llm",
-            help="Generate a narrative report from biomarkers, expression, and predictions.",
-        )
-    else:
-        st.caption("AI-generated reports are not available in this environment.")
+    with st.container(border=True):
+        use_llm = False
+        if llm_available():
+            use_llm = st.toggle(
+                "Use AI-generated clinical report",
+                value=False,
+                key="report_use_llm",
+            )
+        else:
+            st.caption("AI reports unavailable — template mode only.")
 
-    if use_llm:
-        st.markdown(
-            "Generate an **AI clinical report** from biomarkers, expression highlights, "
-            "and model predictions."
-        )
-    else:
-        st.markdown(
-            "Generate a **template-based** patient report from biomarker flags and model predictions."
-        )
-    st.caption(
-        "Combines mutation flags, top log1p(RSEM) genes from the selected expression panel, "
-        "histopathology embedding summary, and predictions from all five backends."
-    )
+        mode = "AI narrative" if use_llm else "Template-based"
+        st.caption(f"Mode: **{mode}** · includes biomarkers, expression, and all five backend predictions.")
 
     pid = patient.get("patient_id")
 
-    if st.button("Generate Report", type="primary", key="gen_report"):
+    if st.button("Generate Report", type="primary", key="gen_report", use_container_width=True):
         predictions = compare_all(target, patient)
         st.session_state.report_predictions = predictions
         if use_llm:
@@ -134,11 +126,11 @@ def render_clinical_report_tab(patient: dict[str, Any], target: str) -> None:
     report_pid = st.session_state.get("report_patient_id")
     report_target = st.session_state.get("report_target")
     if "report_text" not in st.session_state or report_pid != pid or report_target != target:
-        st.info("Click **Generate Report** to build a report for the active patient and target.")
+        empty_state("No report generated", "Click **Generate Report** above.")
         return
 
-    st.markdown(f"### Report for patient `{report_pid}` · {TARGET_TITLES.get(target, target)}")
-    st.text_area("Report Preview", st.session_state.report_text, height=400, key="report_preview")
+    st.markdown(f"**Report** · `{report_pid}` · {TARGET_TITLES.get(target, target)}")
+    report_preview(st.session_state.report_text)
     pdf_bytes = report_to_pdf(st.session_state.report_text)
     st.download_button(
         "Download PDF",
@@ -146,37 +138,26 @@ def render_clinical_report_tab(patient: dict[str, Any], target: str) -> None:
         file_name=f"oncolens_report_{report_pid}.pdf",
         mime="application/pdf",
         key="report_pdf",
+        use_container_width=True,
     )
 
 
 def render_treatment_tab(patient: dict[str, Any], target: str) -> None:
-    use_llm = False
-    if llm_available():
-        use_llm = st.toggle(
-            "Use AI-generated treatment recommendations",
-            value=False,
-            key="treatment_use_llm",
-            help="Generate patient-specific educational treatment guidance.",
-        )
-    else:
-        st.caption("AI-generated recommendations are not available in this environment.")
-
-    if use_llm:
-        st.markdown(
-            "Educational decision-support from **AI-generated** treatment recommendations."
-        )
-    else:
-        st.markdown(
-            "Educational decision-support from **rule-based** biomarker and risk-band logic."
-        )
-    st.caption(
-        "EGFR/KRAS/TMB flags, OS/PFS risk bands, and stage predictions inform suggestions. "
-        "Not a substitute for clinical judgment."
-    )
+    with st.container(border=True):
+        use_llm = False
+        if llm_available():
+            use_llm = st.toggle(
+                "Use AI-generated treatment recommendations",
+                value=False,
+                key="treatment_use_llm",
+            )
+        else:
+            st.caption("AI recommendations unavailable — rule-based mode only.")
+        st.caption("Educational decision-support only — not a substitute for clinical judgment.")
 
     pid = patient.get("patient_id")
 
-    if st.button("Generate Recommendations", type="primary", key="gen_treatment"):
+    if st.button("Generate Recommendations", type="primary", key="gen_treatment", use_container_width=True):
         predictions = compare_all(target, patient)
         if use_llm:
             with st.spinner("Generating recommendations…"):
@@ -201,38 +182,25 @@ def render_treatment_tab(patient: dict[str, Any], target: str) -> None:
     rec_pid = st.session_state.get("treatment_patient_id")
     rec_target = st.session_state.get("treatment_target")
     if rec_pid != pid or rec_target != target:
-        st.info("Click **Generate Recommendations** for the active patient and target.")
+        empty_state("No recommendations yet", "Click **Generate Recommendations** above.")
         return
 
-    st.markdown(
-        f"### Recommendations for patient `{rec_pid}` · {TARGET_TITLES.get(target, target)}"
-    )
+    st.markdown(f"**Recommendations** · `{rec_pid}` · {TARGET_TITLES.get(target, target)}")
 
     if st.session_state.get("treatment_use_llm_result") and st.session_state.get("treatment_llm_text"):
-        st.markdown(st.session_state.treatment_llm_text)
+        with st.container(border=True):
+            st.markdown(st.session_state.treatment_llm_text)
         return
 
     rec = st.session_state.get("treatment_rec")
     if not rec:
-        st.info("Click **Generate Recommendations** for the active patient and target.")
+        empty_state("No recommendations yet", "Click **Generate Recommendations** above.")
         return
 
-    st.markdown("#### Risk Assessment")
-    st.write(rec["risk_assessment"])
-    st.markdown("#### Likely Diagnosis")
-    st.write(rec["likely_diagnosis"])
-    st.markdown("#### Treatment Options")
-    for item in rec["treatment_options"]:
-        st.write(f"- {item}")
-    st.markdown("#### Drug Classes")
-    for item in rec["drug_classes"]:
-        st.write(f"- {item}")
-    st.markdown("#### Lifestyle Advice")
-    for item in rec["lifestyle_advice"]:
-        st.write(f"- {item}")
-    st.markdown("#### Monitoring Suggestions")
-    for item in rec["monitoring"]:
-        st.write(f"- {item}")
-    st.markdown("#### Questions for Your Oncologist")
-    for item in rec["questions_for_oncologist"]:
-        st.write(f"- {item}")
+    report_section_card("Risk Assessment", rec["risk_assessment"])
+    report_section_card("Likely Diagnosis", rec["likely_diagnosis"])
+    report_section_card("Treatment Options", rec["treatment_options"])
+    report_section_card("Drug Classes", rec["drug_classes"])
+    report_section_card("Lifestyle Advice", rec["lifestyle_advice"])
+    report_section_card("Monitoring Suggestions", rec["monitoring"])
+    report_section_card("Questions for Your Oncologist", rec["questions_for_oncologist"])
