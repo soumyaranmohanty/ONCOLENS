@@ -4,6 +4,11 @@ backgroundColor = "#f1f5f9"
 secondaryBackgroundColor = "#ffffff"
 textColor = "#0f172a"
 font = "sans serif"
+baseFontSize = 22
+headingFontSizes = ["2.75rem", "2.25rem", "1.875rem", "1.5rem", "1.25rem", "1.125rem"]
+
+[theme.sidebar]
+baseFontSize = 20
 
 [server]
 headless = true

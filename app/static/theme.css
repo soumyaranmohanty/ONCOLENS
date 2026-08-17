@@ -1,42 +1,178 @@
-/* ONCOLENS clinical light theme — scoped class names only */
+/* ONCOLENS clinical light theme — scoped class names + global readability scale */
+
+/* --- Global Streamlit readability (high-DPI / wide layout) --- */
+[data-testid="stAppViewContainer"] {
+  font-size: 22px !important;
+}
+
+[data-testid="stSidebar"] {
+  font-size: 20px !important;
+}
+
+.main .block-container {
+  padding-top: 2.25rem;
+  padding-bottom: 3rem;
+  max-width: 1280px;
+}
+
+/* Page navigation links */
+[data-testid="stSidebarNav"] a,
+[data-testid="stSidebarNav"] span,
+[data-testid="stSidebarNav"] p,
+[data-testid="stPageLink-NavLink"] {
+  font-size: 1.05em !important;
+  line-height: 1.5 !important;
+}
+
+/* Markdown body copy */
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] li,
+[data-testid="stMarkdownContainer"] td,
+[data-testid="stMarkdownContainer"] th {
+  font-size: 1.05em !important;
+  line-height: 1.65 !important;
+}
+
+[data-testid="stMarkdownContainer"] h1 {
+  font-size: 2em !important;
+}
+
+[data-testid="stMarkdownContainer"] h2 {
+  font-size: 1.75em !important;
+}
+
+[data-testid="stMarkdownContainer"] h3 {
+  font-size: 1.5em !important;
+}
+
+[data-testid="stMarkdownContainer"] h4,
+[data-testid="stMarkdownContainer"] h5,
+[data-testid="stMarkdownContainer"] h6 {
+  font-size: 1.25em !important;
+}
+
+[data-testid="stMetric"] label {
+  font-size: 1.05em !important;
+}
+
+[data-testid="stMetricValue"] {
+  font-size: 2.25em !important;
+}
+
+[data-testid="stMetricDelta"] {
+  font-size: 1em !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stMetricValue"] {
+  font-size: 1.75em !important;
+}
+
+label[data-testid="stWidgetLabel"] p,
+label[data-testid="stWidgetLabel"] span {
+  font-size: 1.05em !important;
+}
+
+.stButton button,
+[data-testid="stDownloadButton"] button {
+  font-size: 1.05em !important;
+  padding: 0.65rem 1.25rem !important;
+  min-height: 3rem;
+}
+
+[data-testid="stSelectbox"] div[data-baseweb="select"],
+[data-testid="stSelectbox"] div[data-baseweb="select"] > div,
+[data-testid="stTextInput"] input,
+[data-testid="stTextArea"] textarea,
+[data-testid="stFileUploader"] section,
+[data-testid="stFileUploader"] small {
+  font-size: 1.05em !important;
+}
+
+[data-testid="stTabs"] button {
+  font-size: 1.05em !important;
+  padding: 0.75rem 1.15rem !important;
+}
+
+[data-testid="stCaptionContainer"],
+[data-testid="stCaptionContainer"] p {
+  font-size: 1em !important;
+}
+
+[data-testid="stAlert"] p,
+[data-testid="stAlert"] div {
+  font-size: 1.05em !important;
+}
+
+[data-testid="stDataFrame"] div,
+[data-testid="stDataFrame"] td,
+[data-testid="stDataFrame"] th {
+  font-size: 1em !important;
+}
+
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary span {
+  font-size: 1.05em !important;
+}
+
+[data-testid="stCheckbox"] label span,
+[data-testid="stToggle"] label span {
+  font-size: 1.05em !important;
+}
+
+[data-testid="stChatMessage"],
+[data-testid="stChatMessage"] p {
+  font-size: 1.05em !important;
+  line-height: 1.65 !important;
+}
+
+[data-testid="stChatInput"] textarea {
+  font-size: 1.05em !important;
+}
+
+/* Bordered containers */
+[data-testid="stVerticalBlockBorderWrapper"] {
+  font-size: 1em;
+}
+
+/* --- ONCOLENS components --- */
 
 .oncolens-hero {
   background: linear-gradient(135deg, #0d9488 0%, #0f766e 55%, #115e59 100%);
   border-radius: 12px;
-  padding: 1.75rem 2rem;
-  margin-bottom: 1.25rem;
+  padding: 2rem 2.25rem;
+  margin-bottom: 1.5rem;
   color: #ffffff;
   box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
 }
 
 .oncolens-hero h1 {
   color: #ffffff !important;
-  font-size: 1.85rem !important;
+  font-size: 2.75rem !important;
   font-weight: 700 !important;
-  margin: 0 0 0.35rem 0 !important;
+  margin: 0 0 0.5rem 0 !important;
   padding: 0 !important;
   border: none !important;
 }
 
 .oncolens-hero p {
   color: rgba(255, 255, 255, 0.92);
-  font-size: 1rem;
-  margin: 0 0 0.75rem 0;
-  line-height: 1.5;
+  font-size: 1.35rem;
+  margin: 0 0 0.85rem 0;
+  line-height: 1.55;
 }
 
 .oncolens-hero-badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: 0.55rem;
+  margin-top: 0.65rem;
 }
 
 .oncolens-badge {
   display: inline-block;
-  padding: 0.2rem 0.65rem;
+  padding: 0.3rem 0.75rem;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 1.05rem;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
@@ -97,27 +233,27 @@
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 1.1rem 1.25rem;
-  margin-bottom: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 0.85rem;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
 }
 
 .oncolens-card-title {
-  font-size: 0.95rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: #0f172a;
-  margin: 0 0 0.35rem 0;
+  margin: 0 0 0.45rem 0;
 }
 
 .oncolens-card-sub {
-  font-size: 0.82rem;
+  font-size: 1.15rem;
   color: #64748b;
   margin: 0;
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
 .oncolens-patient-id {
-  font-size: 1.1rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: #0f766e;
   font-family: ui-monospace, monospace;
@@ -126,15 +262,15 @@
 .oncolens-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-top: 0.5rem;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
 }
 
 .oncolens-chip {
   display: inline-block;
-  padding: 0.15rem 0.55rem;
+  padding: 0.25rem 0.7rem;
   border-radius: 6px;
-  font-size: 0.72rem;
+  font-size: 1.05rem;
   font-weight: 500;
   background: #f0fdfa;
   color: #0f766e;
@@ -150,17 +286,17 @@
 .oncolens-steps {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0.75rem 0 1.25rem 0;
+  gap: 0.65rem;
+  margin: 0.85rem 0 1.5rem 0;
 }
 
 .oncolens-step {
   flex: 1;
-  min-width: 140px;
+  min-width: 160px;
   text-align: center;
-  padding: 0.55rem 0.75rem;
+  padding: 0.75rem 0.9rem;
   border-radius: 8px;
-  font-size: 0.78rem;
+  font-size: 1.15rem;
   font-weight: 500;
   color: #64748b;
   background: #ffffff;
@@ -183,38 +319,38 @@
 .oncolens-workflow-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin: 0.5rem 0 1rem 0;
+  gap: 0.85rem;
+  margin: 0.65rem 0 1.25rem 0;
 }
 
 .oncolens-workflow-item {
   flex: 1;
-  min-width: 120px;
+  min-width: 140px;
   text-align: center;
-  padding: 0.65rem;
+  padding: 0.85rem;
   border-radius: 8px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  font-size: 0.8rem;
+  font-size: 1.15rem;
 }
 
 .oncolens-workflow-num {
   display: block;
-  font-size: 1.1rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: #0d9488;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.3rem;
 }
 
 .oncolens-quick-link {
   display: block;
-  padding: 1rem 1.1rem;
+  padding: 1.15rem 1.25rem;
   border-radius: 10px;
   border: 1px solid #e2e8f0;
   background: #ffffff;
   text-decoration: none !important;
   transition: border-color 0.15s, box-shadow 0.15s;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.65rem;
 }
 
 .oncolens-quick-link:hover {
@@ -225,93 +361,94 @@
 .oncolens-quick-link-title {
   font-weight: 600;
   color: #0f172a;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
 }
 
 .oncolens-quick-link-desc {
-  font-size: 0.78rem;
+  font-size: 1.15rem;
   color: #64748b;
-  margin-top: 0.25rem;
+  margin-top: 0.35rem;
 }
 
 .oncolens-arch-col {
-  padding: 1rem;
+  padding: 1.15rem;
   border-radius: 10px;
   border: 1px solid #e2e8f0;
   background: #ffffff;
-  min-height: 140px;
+  min-height: 160px;
 }
 
 .oncolens-arch-col h4 {
   color: #0d9488;
-  font-size: 0.88rem;
-  margin: 0 0 0.5rem 0;
+  font-size: 1.05rem;
+  margin: 0 0 0.65rem 0;
 }
 
 .oncolens-arch-col ul {
   margin: 0;
-  padding-left: 1.1rem;
-  font-size: 0.78rem;
+  padding-left: 1.2rem;
+  font-size: 1.15rem;
   color: #475569;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 .oncolens-report-preview {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 1rem 1.15rem;
-  font-size: 0.88rem;
-  line-height: 1.6;
-  max-height: 420px;
+  padding: 1.15rem 1.35rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  max-height: 480px;
   overflow-y: auto;
   white-space: pre-wrap;
   font-family: ui-sans-serif, system-ui, sans-serif;
 }
 
 .oncolens-disclaimer {
-  margin-top: 1.5rem;
-  padding: 0.65rem 0.85rem;
+  margin-top: 1.75rem;
+  padding: 0.85rem 1rem;
   border-top: 1px solid #e2e8f0;
-  font-size: 0.72rem;
+  font-size: 1.05rem;
   color: #94a3b8;
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
 .oncolens-sidebar-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 0.65rem 0.75rem;
-  margin-top: 0.25rem;
-  font-size: 0.78rem;
+  padding: 0.85rem 0.95rem;
+  margin-top: 0.35rem;
+  font-size: 1.15rem;
 }
 
 .oncolens-sidebar-id {
   font-family: ui-monospace, monospace;
   font-weight: 600;
   color: #0f766e;
-  font-size: 0.82rem;
+  font-size: 1rem;
 }
 
 .oncolens-empty {
   text-align: center;
-  padding: 2rem 1rem;
+  padding: 2.25rem 1.25rem;
   color: #64748b;
+  font-size: 1.05rem;
   border: 1px dashed #cbd5e1;
   border-radius: 10px;
   background: #f8fafc;
 }
 
 .oncolens-pred-metric {
-  font-size: 1.75rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: #0d9488;
   line-height: 1.1;
 }
 
 .oncolens-pred-label {
-  font-size: 0.75rem;
+  font-size: 1.1rem;
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -320,14 +457,15 @@
 .oncolens-interpret {
   background: #f0fdfa;
   border-left: 3px solid #0d9488;
-  padding: 0.65rem 0.85rem;
+  padding: 0.85rem 1rem;
   border-radius: 0 6px 6px 0;
-  font-size: 0.85rem;
-  margin: 0.5rem 0;
+  font-size: 1rem;
+  margin: 0.65rem 0;
 }
 
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
   background: #f0fdfa;
   border-radius: 10px;
   border: 1px solid #ccfbf1;
+  font-size: 1rem;
 }

@@ -49,7 +49,7 @@ def render() -> None:
     kpi_row([
         ("Cancer type", "TCGA LUAD", None),
         ("3-Mod cohort", "450 patients", None),
-        ("4-Mod cohort", "44 patients", "provisional"),
+        ("4-Mod cohort", "120 patients", "provisional"),
     ])
 
     section("Quick actions", "Jump to the main workflows")

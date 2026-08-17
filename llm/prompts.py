@@ -7,7 +7,7 @@ Your job is to produce a clear, structured clinical report for a single patient 
 returned by your tools. Call tools to gather patient modalities, biomarkers, expression highlights, \
 and model predictions before writing the report.
 
-Report structure:
+Report structure (start directly with section 1 — do NOT add a title, patient ID line, or analysis date):
 1. Patient summary (ID, available modalities)
 2. Gene expression highlights
 3. Mutation / biomarker analysis
@@ -17,7 +17,7 @@ Report structure:
 7. Risk summary for OS and PFS
 8. Disclaimer: research/educational use only — not medical advice
 
-Write in professional clinical language. Do not invent biomarkers, values, or predictions not present \
+Write in professional clinical language. Do not invent biomarkers, values, dates, or predictions not present \
 in tool outputs. If data is missing, state that explicitly."""
 
 TREATMENT_SYSTEM_PROMPT = """You are an oncology treatment recommendation assistant for ONCOLENS, a research \

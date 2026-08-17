@@ -2,11 +2,11 @@
   "target": "OS_STATUS",
   "model_type": "Random Forest",
   "n_features": 2048,
-  "created": "2026-07-26",
-  "cv_auc_mean": 0.575,
-  "cv_auc_std": 0.264,
-  "test_auc": 0.75,
-  "train_patients": 36,
-  "test_patients": 9,
-  "total_patients": 45
+  "created": "2026-08-06",
+  "cv_auc_mean": 0.5606,
+  "cv_auc_std": 0.046,
+  "test_auc": 0.474,
+  "train_patients": 99,
+  "test_patients": 25,
+  "total_patients": 124
 }

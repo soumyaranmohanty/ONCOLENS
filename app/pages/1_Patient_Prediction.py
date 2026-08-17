@@ -18,6 +18,10 @@ from app.components.patient_workflow import (
 from app.config import TARGETS
 from app.inference.patient import make_demo_patient, make_uploaded_patient
 from app.inference.tables import demo_patient_ids
+from app.services.histopathology_embed import (
+    embedding_from_upload,
+    histopathology_inference_available,
+)
 from app.services.history import init_history, set_last_patient
 
 
@@ -45,8 +49,22 @@ def render() -> None:
 
     with col_demo:
         with st.container(border=True):
-            st.markdown("**TCGA Demo**")
-            ids = demo_patient_ids(target, four_mod=False)
+            st.markdown("**TCGA Demo (test set)**")
+            total_demo = demo_patient_ids(target)
+            histo_demo = demo_patient_ids(target, require_modality="Histopathology")
+            st.caption(
+                f"{len(total_demo)} held-out test patients · "
+                f"{len(histo_demo)} with histopathology embeddings"
+            )
+            histo_only = st.checkbox(
+                "Only patients with histopathology",
+                key="demo_histo_only",
+                help="Required for Histopathology and 4-Modality predictions.",
+            )
+            ids = demo_patient_ids(
+                target,
+                require_modality="Histopathology" if histo_only else None,
+            )
             if not ids:
                 st.warning("No demo patients for this cohort.")
             else:
@@ -61,20 +79,39 @@ def render() -> None:
 
     with col_upload:
         with st.container(border=True):
-            st.markdown("**Upload CSVs**")
+            st.markdown("**Upload data**")
             pid = st.text_input("Patient ID", value="UPLOAD-001", key="upload_pid")
-            expr_f = st.file_uploader("Expression", type=["csv"], key="up_expr")
-            mut_f = st.file_uploader("Mutation", type=["csv"], key="up_mut")
-            clin_f = st.file_uploader("Clinical", type=["csv"], key="up_clin")
-            histo_f = st.file_uploader("Histopathology (optional)", type=["csv"], key="up_histo")
+            expr_f = st.file_uploader("Expression (CSV)", type=["csv"], key="up_expr")
+            mut_f = st.file_uploader("Mutation (CSV)", type=["csv"], key="up_mut")
+            clin_f = st.file_uploader("Clinical (CSV)", type=["csv"], key="up_clin")
+            histo_f = st.file_uploader(
+                "Histopathology slide (optional)",
+                type=["svs", "csv"],
+                key="up_histo",
+                help="Upload a diagnostic whole-slide image (.svs). "
+                "Precomputed 2048-D embedding CSVs are also accepted.",
+            )
+            if not histopathology_inference_available():
+                st.caption(
+                    "`.svs` processing requires `uv sync --extra histopathology` "
+                    "(torch, OpenSlide). CSV embeddings work without it."
+                )
             if st.button("Build from uploads", key="build_upload", use_container_width=True):
+                histo_df = None
+                if histo_f is not None:
+                    with st.spinner("Extracting histopathology features from slide…"):
+                        try:
+                            histo_df = embedding_from_upload(histo_f, pid)
+                        except Exception as exc:
+                            st.error(f"Histopathology processing failed: {exc}")
+                            st.stop()
                 set_last_patient(
                     make_uploaded_patient(
                         pid,
                         expression=pd.read_csv(expr_f) if expr_f else None,
                         mutation=pd.read_csv(mut_f) if mut_f else None,
                         clinical=pd.read_csv(clin_f) if clin_f else None,
-                        histopathology=pd.read_csv(histo_f) if histo_f else None,
+                        histopathology=histo_df,
                     )
                 )
                 st.session_state.loaded_demo_id = None
@@ -82,7 +119,7 @@ def render() -> None:
 
     patient = st.session_state.get("last_patient")
     if patient is None:
-        st.info("Select a demo patient or upload CSVs above to continue.")
+        st.info("Select a demo patient or upload data above to continue.")
         render_disclaimer()
         return
 

@@ -8,6 +8,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 
 from llm.agents.base import build_react_agent, extract_agent_text
 from llm.agents.tools import build_patient_tools
+from app.services.report import finalize_llm_report
 from llm.llm_utils import llm_gemma
 from llm.prompts import CLINICAL_REPORT_SYSTEM_PROMPT
 
@@ -49,9 +50,11 @@ def generate_clinical_report(
                 (
                     "user",
                     f"Generate a complete clinical report for patient {pid}. "
-                    f"Use your tools to gather all available data first, then write the report.",
+                    f"Use your tools to gather all available data first, then write the report. "
+                    f"Do not include a report title, patient ID header line, or analysis date anywhere in your response.",
                 )
             ]
         }
     )
-    return extract_agent_text(result)
+    raw = extract_agent_text(result)
+    return finalize_llm_report(raw, pid)

@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 import pandas as pd
 
-from app.config import CLINICAL_PATH, SINGLE_MOD_STORE, TARGETS
+from app.config import CLINICAL_PATH, FEATURE_STORE, SINGLE_MOD_STORE, TARGETS
 
 
 def _read_features(modality: str, target: str) -> pd.DataFrame | None:
@@ -83,13 +84,31 @@ def load_processed_tables() -> dict[str, Any]:
     return tables
 
 
-def demo_patient_ids(target: str, four_mod: bool = False) -> list[str]:
+def _test_patient_ids(target: str) -> set[str]:
+    meta_path = FEATURE_STORE / "multimodal_model" / target / "metadata.json"
+    if not meta_path.exists():
+        return set()
+    with open(meta_path, encoding="utf-8") as f:
+        meta = json.load(f)
+    return set(meta.get("test_patient_ids", []))
+
+
+def demo_patient_ids(
+    target: str,
+    four_mod: bool = False,
+    require_modality: str | None = None,
+) -> list[str]:
     tables = load_processed_tables()
     key = "four_way" if four_mod else "three_way"
     ids = tables["intersections"][target][key]
     histo = tables["per_target"][target]["Histopathology"]
     if four_mod and histo is not None:
         ids = ids & set(histo.index.astype(str))
+    ids &= _test_patient_ids(target)
+    if require_modality:
+        mod_df = tables["per_target"][target].get(require_modality)
+        if mod_df is not None:
+            ids &= set(mod_df.index.astype(str))
     return sorted(ids)
 
 

@@ -28,22 +28,29 @@ MODEL_COLORS = {
 }
 
 PLOTLY_LAYOUT = {
-    "font": {"family": "sans-serif", "color": TEXT, "size": 12},
+    "font": {"family": "sans-serif", "color": TEXT, "size": 16},
     "paper_bgcolor": SURFACE,
     "plot_bgcolor": SURFACE,
-    "margin": {"l": 48, "r": 24, "t": 48, "b": 48},
+    "margin": {"l": 56, "r": 32, "t": 56, "b": 56},
     "colorway": list(MODEL_COLORS.values()),
     "xaxis": {
         "gridcolor": BORDER,
         "linecolor": BORDER,
         "zerolinecolor": BORDER,
+        "tickfont": {"size": 15},
     },
     "yaxis": {
         "gridcolor": BORDER,
         "linecolor": BORDER,
         "zerolinecolor": BORDER,
+        "tickfont": {"size": 15},
     },
-    "legend": {"bgcolor": "rgba(255,255,255,0.8)", "bordercolor": BORDER, "borderwidth": 1},
+    "legend": {
+        "bgcolor": "rgba(255,255,255,0.8)",
+        "bordercolor": BORDER,
+        "borderwidth": 1,
+        "font": {"size": 15},
+    },
 }
 
 
@@ -65,6 +72,6 @@ def risk_badge_class(risk_band: str) -> str:
 def apply_plotly_layout(fig, title: str | None = None):
     layout = dict(PLOTLY_LAYOUT)
     if title:
-        layout["title"] = {"text": title, "font": {"size": 14, "color": TEXT}}
+        layout["title"] = {"text": title, "font": {"size": 20, "color": TEXT}}
     fig.update_layout(**layout)
     return fig

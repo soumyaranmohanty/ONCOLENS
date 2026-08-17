@@ -22,6 +22,6 @@ uv run streamlit run app/oncolens_inference.py
 
 ## Notes
 
-- Histopathology accepts **precomputed** 2048-D embedding vectors only (no `.svs` upload).
+- Histopathology upload accepts **`.svs` whole-slide images** (requires `--extra histopathology`) or precomputed 2048-D **CSV** embeddings.
 - **4-Modality** predictions activate automatically when `Data/feature_store/multimodal_model_v4/` exists.
 - Requires `Data/feature_store/` artifacts from the training pipeline.

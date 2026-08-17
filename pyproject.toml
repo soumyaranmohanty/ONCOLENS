@@ -22,7 +22,7 @@ histopathology = [
     "openslide-python",
     "Pillow",
     "histolab",
-    "opencv-python",
+    "opencv-python>=4.10",
 ]
 app = ["streamlit>=1.33", "plotly", "reportlab"]
 llm = [

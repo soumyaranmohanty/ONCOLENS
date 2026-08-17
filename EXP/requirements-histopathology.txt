@@ -8,4 +8,4 @@ Pillow
 histolab
 torch
 torchvision
-opencv-python
+opencv-python>=4.10

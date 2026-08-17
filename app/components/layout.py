@@ -40,7 +40,7 @@ def kpi_row(items: list[tuple[str, str, str | None]]) -> None:
 
 
 def empty_state(message: str, hint: str | None = None) -> None:
-    hint_html = f'<p style="font-size:0.8rem;margin-top:0.5rem;">{hint}</p>' if hint else ""
+    hint_html = f'<p style="font-size:0.95rem;margin-top:0.5rem;">{hint}</p>' if hint else ""
     st.markdown(
         f'<div class="oncolens-empty">{message}{hint_html}</div>',
         unsafe_allow_html=True,

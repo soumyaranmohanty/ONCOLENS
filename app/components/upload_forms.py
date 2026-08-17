@@ -32,5 +32,7 @@ def parse_uploads(
     if clinical_file is not None:
         out["Clinical"] = pd.read_csv(clinical_file)
     if histo_file is not None:
-        out["Histopathology"] = pd.read_csv(histo_file)
+        from app.services.histopathology_embed import embedding_from_upload
+
+        out["Histopathology"] = embedding_from_upload(histo_file, "UPLOAD")
     return out

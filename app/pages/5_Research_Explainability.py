@@ -112,7 +112,7 @@ def render() -> None:
 
         st.markdown("**Histopathology**")
         st.caption(
-            "Batch-0 provisional: 2048-D ResNet50 embeddings, mean-pooled per patient."
+            "124 patients with histopathology embeddings; 120 overlap the 3-mod cohort (450 patients)."
         )
 
     render_disclaimer()

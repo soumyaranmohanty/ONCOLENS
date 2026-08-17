@@ -17,7 +17,7 @@ from app.inference.loaders import four_mod_available
 from app.inference.predict import compare_all, predict_multimodal, predict_single
 from app.services.history import append_prediction
 from app.services.llm_agents import generate_llm_clinical_report, generate_llm_treatment_text, llm_available
-from app.services.report import generate_report_text, report_to_pdf
+from app.services.report import generate_report_text, normalize_clinical_report, report_to_pdf
 from app.services.treatment import generate_treatment_recommendations
 
 
@@ -33,6 +33,12 @@ def render_predictions_tab(patient: dict[str, Any], target: str) -> None:
     if model_choice == "4-Modality" and not four_mod_available(target):
         st.info(
             "**4-Modality is not available yet.** Use standalone Histopathology or 3-Modality instead."
+        )
+
+    if model_choice in ("Histopathology", "4-Modality") and "Histopathology" not in patient:
+        st.warning(
+            "This patient has no histopathology embedding. Enable **Only patients with "
+            "histopathology** in the demo panel above, or upload a histopathology CSV."
         )
 
     if st.button("Run Prediction", type="primary", key="run_pred", use_container_width=True):
@@ -122,6 +128,7 @@ def render_clinical_report_tab(patient: dict[str, Any], target: str) -> None:
             st.session_state.report_text = generate_report_text(patient, predictions)
         st.session_state.report_patient_id = pid
         st.session_state.report_target = target
+        st.session_state.report_mode = "ai" if use_llm else "template"
 
     report_pid = st.session_state.get("report_patient_id")
     report_target = st.session_state.get("report_target")
@@ -130,8 +137,14 @@ def render_clinical_report_tab(patient: dict[str, Any], target: str) -> None:
         return
 
     st.markdown(f"**Report** · `{report_pid}` · {TARGET_TITLES.get(target, target)}")
-    report_preview(st.session_state.report_text)
-    pdf_bytes = report_to_pdf(st.session_state.report_text)
+    report_mode = st.session_state.get("report_mode")
+    report_text = normalize_clinical_report(
+        st.session_state.report_text,
+        report_pid,
+        mode=report_mode,
+    )
+    report_preview(report_text)
+    pdf_bytes = report_to_pdf(report_text, patient_id=report_pid)
     st.download_button(
         "Download PDF",
         data=pdf_bytes,
